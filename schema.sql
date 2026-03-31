@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS artists (
 	artist_id SERIAL PRIMARY KEY,
 	artist_name VARCHAR(100) NOT NULL,
-	country VARCHAR(100)
+	country CHAR(2) 
 ); 
 
 CREATE TABLE IF NOT EXISTS albums (
@@ -99,6 +99,83 @@ CREATE INDEX idx_playlist_songs_song_id ON playlist_songs(song_id);
 
 
 /* ================== INSERTS ================== */ 
+
+-- Users 
+INSERT INTO users (user_name, email, last_login) VALUES
+('alice', 'alice@example.com', CURRENT_TIMESTAMP),
+('bob', 'bob@example.com', NULL),
+('charlie', 'charlie@example.com', CURRENT_TIMESTAMP - INTERVAL '2 days'),
+('diana', 'diana@example.com', NULL);
+
+
+-- Artists 
+INSERT INTO artists (artist_name, country) VALUES
+('Coldplay', 'UK'),
+('Taylor Swift', 'USA'),
+('Daft Punk', 'France'),
+('Unknown Indie', NULL);
+
+
+-- Albums 
+INSERT INTO albums (album_name, label, release_year) VALUES
+('Parachutes', 'Parlophone', 2000),
+('1989', 'Big Machine', 2014),
+('Random Access Memories', 'Columbia', 2013);
+
+
+-- Songs 
+INSERT INTO songs (album_id, song_name) VALUES
+(1, 'Yellow'),
+(1, 'Trouble'),
+(2, 'Blank Space'),
+(2, 'Style'),
+(3, 'Get Lucky'),
+(NULL, 'Loose Single');  
+
+
+-- Song artists 
+INSERT INTO song_artists (song_id, artist_id) VALUES
+(1, 1), 
+(2, 1),
+(3, 2),
+(4, 2),
+(5, 3),
+(6, 4); 
+
+
+-- Playlists 
+INSERT INTO playlists (user_id, playlist_name, p_type) VALUES
+(1, 'Favorites', 'public'),
+(1, 'Chill', 'private'),
+(2, 'Workout', 'public'),
+(3, 'Sad Songs', 'private');
+
+
+-- Plays 
+INSERT INTO plays (user_id, song_id, played_at) VALUES
+(1, 1, CURRENT_TIMESTAMP),
+(1, 3, CURRENT_TIMESTAMP - INTERVAL '1 hour'),
+(2, 5, CURRENT_TIMESTAMP - INTERVAL '3 hours'),
+(3, 2, CURRENT_TIMESTAMP - INTERVAL '1 day'),
+(1, 1, CURRENT_TIMESTAMP - INTERVAL '2 days');
+
+
+-- Playlist songs
+INSERT INTO playlist_songs (playlist_id, song_id, position) VALUES
+(1, 1, 1),
+(1, 3, 2),
+(1, 5, 3),
+
+(2, 2, 1),
+(2, 6, 2),
+
+(3, 5, 1),
+
+(4, 2, 1),
+(4, 4, 2);
+
+
+
 
 
 
