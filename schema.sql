@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS playlists (
 
 CREATE TABLE IF NOT EXISTS plays ( 
 	play_id SERIAL PRIMARY KEY, 
-	user_id INT NOT NULL,
+	user_id INT,
 	song_id INT NOT NULL,
 	played_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
 	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS playlist_songs (
 	PRIMARY KEY (playlist_id, song_id),
 	UNIQUE(playlist_id, position),
 	FOREIGN KEY (playlist_id) REFERENCES playlists(playlist_id) ON DELETE CASCADE,
-	FOREIGN KEY (song_id) REFERENCES songs(song_id) ON DELETE SET NULL
+	FOREIGN KEY (song_id) REFERENCES songs(song_id) ON DELETE CASCADE
 	
 ); 
 
