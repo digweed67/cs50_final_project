@@ -51,12 +51,12 @@ CREATE TABLE IF NOT EXISTS song_artists (
 
 CREATE TABLE IF NOT EXISTS playlists (
 	playlist_id SERIAL PRIMARY KEY,
-	user_id INT NOT NULL,
-	playlist_name VARCHAR(80) NOT NULL,
+	user_id INT NOT NULL, -- required
+	playlist_name VARCHAR(80) NOT NULL, -- required
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
-	p_type VARCHAR(10) NOT NULL CHECK(p_type IN('public', 'private')),
-	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-	UNIQUE(user_id, playlist_name)
+	p_type VARCHAR(10) NOT NULL CHECK(p_type IN('public', 'private')), -- type of playlist has to be private or public
+	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE, -- if a user is deleted, their playlists are automatically deleted too
+	UNIQUE(user_id, playlist_name) -- ensures a user can't have two playlists with the same name
 	
 ); 
 
