@@ -151,6 +151,32 @@ EXECUTE FUNCTION log_create_playlist();
 
 
 -- UPDATE PLAYLIST TRIGGER 
+CREATE OR REPLACE FUNCTION log_update_playlist()
+RETURNS TRIGGER AS $$
+BEGIN
+	IF NEW.playlist_name IS DISTINCT FROM OLD.playlist_name
+	THEN
+    INSERT INTO user_logs(
+        user_id, action_type, target_playlist_id, description
+) VALUES (
+        NEW.user_id, 
+		'UPDATE_PLAYLIST',
+        NEW.playlist_id,
+		'Renamed playlist from "' || OLD.playlist_name || '" to "' || NEW.playlist_name || '"'
+    );
+	END IF;
+    RETURN NEW;
+
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_playlist
+AFTER UPDATE ON playlists
+FOR EACH ROW
+EXECUTE FUNCTION log_update_playlist();
+
+
+--- DELETE PLAYLIST TRIGGER 
 
 
 /* ================== INSERTS ================== */ 
