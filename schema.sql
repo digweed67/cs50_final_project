@@ -228,7 +228,32 @@ FOR EACH ROW
 EXECUTE FUNCTION log_add_song();
 
 -- REMOVE SONG FROM PLAYLIST TRIGGER 
+CREATE OR REPLACE FUNCTION log_remove_song()
+RETURNS TRIGGER AS $$
+DECLARE 
+	v_user_id INT;
+BEGIN
+	SELECT user_id INTO v_user_id 
+	FROM playlists 
+	WHERE playlist_id = OLD.playlist_id;
 
+    INSERT INTO user_logs(
+        user_id, action_type, target_playlist_id, description
+) VALUES (
+        v_user_id, 
+		'REMOVE_SONG_FROM_PLAYLIST',
+        OLD.playlist_id,
+		'Removed song id: ' || OLD.song_id
+    );
+    RETURN OLD;
+
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_remove_song
+AFTER DELETE ON playlist_songs
+FOR EACH ROW
+EXECUTE FUNCTION log_remove_song();
 
 /* ================== INSERTS ================== */ 
 
