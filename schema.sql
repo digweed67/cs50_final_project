@@ -23,15 +23,15 @@ CREATE TABLE IF NOT EXISTS artists (
 
 CREATE TABLE IF NOT EXISTS albums (
 	album_id SERIAL PRIMARY KEY,
-	album_name VARCHAR(100) NOT NULL,
+	album_name VARCHAR(100) NOT NULL, -- album name required
 	label VARCHAR(60),
-	release_year INT CHECK (release_year BETWEEN 1900 AND EXTRACT(YEAR FROM CURRENT_DATE))
+	release_year INT CHECK (release_year BETWEEN 1900 AND EXTRACT(YEAR FROM CURRENT_DATE)) -- Must be a valid year up to current date year
 );
 
 CREATE TABLE IF NOT EXISTS songs (
 	song_id SERIAL PRIMARY KEY,
-	album_id INT, 
-	song_name VARCHAR(100) NOT NULL,
+	album_id INT, -- allow null album ids for singles
+	song_name VARCHAR(100) NOT NULL, -- song name required
 	FOREIGN KEY (album_id) REFERENCES albums(album_id) ON DELETE SET NULL
 );  
 
