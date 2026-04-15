@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS artists (
 	artist_id SERIAL PRIMARY KEY,
-	artist_name VARCHAR(100) NOT NULL,
-	country CHAR(2) 
+	artist_name VARCHAR(100) NOT NULL, -- required name
+	country CHAR(2) -- ISO country code, allows consistent grouping
 ); 
 
 CREATE TABLE IF NOT EXISTS albums (
