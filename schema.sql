@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS user_logs (
         )
     ),
 
-    target_id INT, -- playlist_id that's being affected by the action
+    target_playlist_id INT, -- playlist_id that's being affected by the action
 
     description TEXT, -- additional context (e.g. song_id added/removed)
 
@@ -126,9 +126,31 @@ CREATE INDEX idx_playlist_songs_song_id ON playlist_songs(song_id);
 /* ================== VIEWS ================== */ 
 
 
+/* ================== TRIGGERS ================== */ 
+
+-- CREATE PLAYLIST TRIGGER 
+CREATE OR REPLACE FUNCTION log_create_playlist()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO user_logs(
+        user_id, action_type, target_playlist_id, description
+) VALUES (
+        NEW.user_id, 
+		'CREATE_PLAYLIST',
+        NEW.playlist_id,
+		'Created playlist: "' || NEW.playlist_name || '"'
+    );
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_create_playlist
+AFTER INSERT ON playlists
+FOR EACH ROW
+EXECUTE FUNCTION log_create_playlist();
 
 
-
+-- UPDATE PLAYLIST TRIGGER 
 
 
 /* ================== INSERTS ================== */ 
