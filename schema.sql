@@ -200,6 +200,34 @@ EXECUTE FUNCTION log_delete_playlist();
 
 
 -- ADD SONG TO PLAYLIST TRIGGER 
+CREATE OR REPLACE FUNCTION log_add_song()
+RETURNS TRIGGER AS $$
+DECLARE 
+	v_user_id INT;
+BEGIN
+	SELECT user_id INTO v_user_id 
+	FROM playlists 
+	WHERE playlist_id = NEW.playlist_id;
+
+    INSERT INTO user_logs(
+        user_id, action_type, target_playlist_id, description
+) VALUES (
+        v_user_id, 
+		'ADD_SONG_TO_PLAYLIST',
+        NEW.playlist_id,
+		'Added song id: ' || NEW.song_id
+    );
+    RETURN NEW;
+
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_add_song
+AFTER INSERT ON playlist_songs
+FOR EACH ROW
+EXECUTE FUNCTION log_add_song();
+
+-- REMOVE SONG FROM PLAYLIST TRIGGER 
 
 
 /* ================== INSERTS ================== */ 
