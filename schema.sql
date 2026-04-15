@@ -177,6 +177,29 @@ EXECUTE FUNCTION log_update_playlist();
 
 
 --- DELETE PLAYLIST TRIGGER 
+CREATE OR REPLACE FUNCTION log_delete_playlist()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO user_logs(
+        user_id, action_type, target_playlist_id, description
+) VALUES (
+        OLD.user_id, 
+		'DELETE_PLAYLIST',
+        OLD.playlist_id,
+		'Deleted playlist: "' || OLD.playlist_name || '"'
+    );
+    RETURN OLD;
+
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_delete_playlist
+AFTER DELETE ON playlists
+FOR EACH ROW
+EXECUTE FUNCTION log_delete_playlist();
+
+
+-- ADD SONG TO PLAYLIST TRIGGER 
 
 
 /* ================== INSERTS ================== */ 
