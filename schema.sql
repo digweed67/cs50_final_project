@@ -41,6 +41,12 @@ CREATE TABLE IF NOT EXISTS song_artists (
 	PRIMARY KEY (song_id, artist_id),
 	FOREIGN KEY (song_id) REFERENCES songs(song_id) ON DELETE CASCADE,
 	FOREIGN KEY(artist_id) REFERENCES artists(artist_id) ON DELETE CASCADE
+	/* this is a joint table to reflect the many to many relationship 
+	 * between songs and artists. ON DELETE CASCADE is appropriate 
+	 * because each row depends entirely on both parents. 
+	 * If a song or artist is removed the relationship row becomes 
+	 * invalid and should be removed. 
+	 */
 ); 
 
 CREATE TABLE IF NOT EXISTS playlists (
