@@ -65,8 +65,8 @@ CREATE TABLE IF NOT EXISTS plays (
 	user_id INT,
 	song_id INT NOT NULL,
 	played_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
-	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL,
-	FOREIGN KEY (song_id) REFERENCES songs(song_id) ON DELETE CASCADE 
+	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL, -- if the user is deleted, preserve play record but remove user association
+	FOREIGN KEY (song_id) REFERENCES songs(song_id) ON DELETE CASCADE -- if the song is deleted then delete its plays
 	 
 ); 
 
