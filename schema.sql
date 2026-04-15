@@ -75,12 +75,39 @@ CREATE TABLE IF NOT EXISTS playlist_songs (
 	song_id INT NOT NULL,
 	position INT NOT NULL,
 	PRIMARY KEY (playlist_id, song_id),
-	UNIQUE(playlist_id, position),
+	UNIQUE(playlist_id, position), -- position is unique per playlist
 	FOREIGN KEY (playlist_id) REFERENCES playlists(playlist_id) ON DELETE CASCADE,
 	FOREIGN KEY (song_id) REFERENCES songs(song_id) ON DELETE CASCADE
-	
+	/* if the playlist or song are deleted in the parent table, then corresponding
+	 * rows are removed from this table via on delete cascade 
+	 */
 ); 
 
+-- audit log for playlist-related user actions  
+
+CREATE TABLE IF NOT EXISTS user_logs (
+    log_id SERIAL PRIMARY KEY,
+
+    user_id INT, -- user who performed action, nullable to preserve logs if user is deleted
+
+    action_type VARCHAR(50) NOT NULL CHECK (
+        action_type IN (
+            'CREATE_PLAYLIST',
+            'UPDATE_PLAYLIST',
+            'DELETE_PLAYLIST',
+            'ADD_SONG_TO_PLAYLIST',
+            'REMOVE_SONG_FROM_PLAYLIST'
+        )
+    ),
+
+    target_id INT, -- playlist_id that's being affected by the action
+
+    description TEXT, -- additional context (e.g. song_id added/removed)
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
+);
 
 
 /* ================== INDEXES ================== */ 
