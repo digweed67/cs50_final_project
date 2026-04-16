@@ -1,5 +1,14 @@
 -- In this SQL file, write (and comment!) the schema of your database, including the CREATE TABLE, CREATE INDEX, CREATE VIEW, etc. statements that compose it
-
+/* ================== RESET ================== */
+DROP TABLE IF EXISTS playlist_songs CASCADE;
+DROP TABLE IF EXISTS plays CASCADE;
+DROP TABLE IF EXISTS playlists CASCADE;
+DROP TABLE IF EXISTS song_artists CASCADE;
+DROP TABLE IF EXISTS songs CASCADE;
+DROP TABLE IF EXISTS albums CASCADE;
+DROP TABLE IF EXISTS artists CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS user_logs CASCADE;
 
 SET search_path TO public; 
 
@@ -257,15 +266,30 @@ EXECUTE FUNCTION log_remove_song();
 
 /* ================== INSERTS ================== */ 
 
--- Users 
+/* 
+ SEED DATA STRATEGY:
+ - Core entities inserted manually (users, artists, songs)
+ - Relationships explicitly defined
+ - Additional users & playlists for realistic variety
+ - Plays generated using random + biased distribution
+*/
+
+
+/* ---------- USERS ---------- */
 INSERT INTO users (user_name, email, last_login) VALUES
 ('alice', 'alice@example.com', CURRENT_TIMESTAMP),
 ('bob', 'bob@example.com', NULL),
 ('charlie', 'charlie@example.com', CURRENT_TIMESTAMP - INTERVAL '2 days'),
-('diana', 'diana@example.com', NULL);
+('diana', 'diana@example.com', NULL),
+('eve', 'eve@example.com', CURRENT_TIMESTAMP - INTERVAL '5 hours'),
+('frank', 'frank@example.com', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+('grace', 'grace@example.com', NULL),
+('henry', 'henry@example.com', CURRENT_TIMESTAMP - INTERVAL '3 days'),
+('irene', 'irene@example.com', CURRENT_TIMESTAMP),
+('jack', 'jack@example.com', CURRENT_TIMESTAMP - INTERVAL '10 hours');
 
 
--- Artists 
+/* ---------- ARTISTS ---------- */
 INSERT INTO artists (artist_name, country) VALUES
 ('Coldplay', 'GB'),
 ('Taylor Swift', 'US'),
@@ -273,63 +297,105 @@ INSERT INTO artists (artist_name, country) VALUES
 ('Unknown Indie', NULL);
 
 
--- Albums 
+/* ---------- ALBUMS ---------- */
 INSERT INTO albums (album_name, label, release_year) VALUES
 ('Parachutes', 'Parlophone', 2000),
 ('1989', 'Big Machine', 2014),
 ('Random Access Memories', 'Columbia', 2013);
 
 
--- Songs 
+/* ---------- SONGS ---------- */
 INSERT INTO songs (album_id, song_name) VALUES
 (1, 'Yellow'),
 (1, 'Trouble'),
+(1, 'Shiver'),
 (2, 'Blank Space'),
 (2, 'Style'),
+(2, 'Shake It Off'),
 (3, 'Get Lucky'),
-(NULL, 'Loose Single');  
+(3, 'Instant Crush'),
+(NULL, 'Loose Single'),
+(NULL, 'Another Single');
 
 
--- Song artists 
+/* ---------- SONG_ARTISTS ---------- */
 INSERT INTO song_artists (song_id, artist_id) VALUES
-(1, 1), 
-(2, 1),
-(3, 2),
-(4, 2),
-(5, 3),
-(6, 4); 
+(1, 1), (2, 1), (3, 1),
+(4, 2), (5, 2), (6, 2),
+(7, 3), (8, 3),
+(9, 4), (10, 4);
 
 
--- Playlists 
+/* ---------- PLAYLISTS ---------- */
 INSERT INTO playlists (user_id, playlist_name, p_type) VALUES
 (1, 'Favorites', 'public'),
 (1, 'Chill', 'private'),
 (2, 'Workout', 'public'),
-(3, 'Sad Songs', 'private');
+(3, 'Sad Songs', 'private'),
+(2, 'Focus', 'private'),
+(2, 'Party Mix', 'public'),
+(3, 'Late Night', 'private'),
+(4, 'Road Trip', 'public'),
+(5, 'Indie Vibes', 'public'),
+(6, 'Gym Hits', 'private'),
+(7, 'Throwbacks', 'public');
 
 
--- Plays 
+/* ---------- PLAYLIST_SONGS ---------- */
+INSERT INTO playlist_songs (playlist_id, song_id, position) VALUES
+-- original playlists
+(1, 1, 1), (1, 4, 2), (1, 7, 3),
+(2, 2, 1), (2, 9, 2),
+(3, 7, 1),
+(4, 2, 1), (4, 5, 2),
+
+-- new playlists
+(5, 1, 1), (5, 3, 2), (5, 4, 3),
+(6, 5, 1), (6, 6, 2), (6, 7, 3),
+(7, 2, 1), (7, 8, 2),
+(8, 3, 1), (8, 6, 2), (8, 7, 3),
+(9, 9, 1), (9, 10, 2),
+(10, 5, 1), (10, 7, 2),
+(11, 1, 1), (11, 8, 2);
+
+
+/* ---------- PLAYS (BASE DATA) ---------- */
 INSERT INTO plays (user_id, song_id, played_at) VALUES
 (1, 1, CURRENT_TIMESTAMP),
-(1, 3, CURRENT_TIMESTAMP - INTERVAL '1 hour'),
-(2, 5, CURRENT_TIMESTAMP - INTERVAL '3 hours'),
+(1, 4, CURRENT_TIMESTAMP - INTERVAL '1 hour'),
+(2, 7, CURRENT_TIMESTAMP - INTERVAL '3 hours'),
 (3, 2, CURRENT_TIMESTAMP - INTERVAL '1 day'),
 (1, 1, CURRENT_TIMESTAMP - INTERVAL '2 days');
 
 
--- Playlist songs
-INSERT INTO playlist_songs (playlist_id, song_id, position) VALUES
-(1, 1, 1),
-(1, 3, 2),
-(1, 5, 3),
+/* ---------- PLAYS (RANDOM ACTIVITY) ---------- */
+-- simulate general listening over last 7 days
+INSERT INTO plays (user_id, song_id, played_at)
+SELECT 
+    (RANDOM() * 9 + 1)::INT,
+    (RANDOM() * 9 + 1)::INT,
+    CURRENT_TIMESTAMP - (RANDOM() * INTERVAL '7 days')
+FROM generate_series(1, 120);
 
-(2, 2, 1),
-(2, 6, 2),
 
-(3, 5, 1),
+/* ---------- PLAYS ---------- */
+-- make song_id = 1 clearly the most popular
+INSERT INTO plays (user_id, song_id, played_at)
+SELECT 
+    (RANDOM() * 9 + 1)::INT,
+    1,
+    CURRENT_TIMESTAMP - (RANDOM() * INTERVAL '3 days')
+FROM generate_series(1, 60);
 
-(4, 2, 1),
-(4, 4, 2);
+SELECT * FROM users;
+SELECT * FROM artists;
+SELECT * FROM albums;
+SELECT * FROM songs;
+SELECT * FROM song_artists;
+SELECT * FROM playlists;
+SELECT * FROM playlist_songs;
+SELECT * FROM plays;
+SELECT * FROM user_logs;
 
 
 
