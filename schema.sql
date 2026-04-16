@@ -267,9 +267,9 @@ INSERT INTO users (user_name, email, last_login) VALUES
 
 -- Artists 
 INSERT INTO artists (artist_name, country) VALUES
-('Coldplay', 'UK'),
-('Taylor Swift', 'USA'),
-('Daft Punk', 'France'),
+('Coldplay', 'GB'),
+('Taylor Swift', 'US'),
+('Daft Punk', 'FR'),
 ('Unknown Indie', NULL);
 
 
@@ -330,14 +330,6 @@ INSERT INTO playlist_songs (playlist_id, song_id, position) VALUES
 
 (4, 2, 1),
 (4, 4, 2);
-
-
-
-
-
-
-
-
 
 
 
