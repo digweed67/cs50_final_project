@@ -57,5 +57,26 @@ WHERE last_login IS NULL;
 SELECT playlist_id, playlist_name
 FROM playlists
 WHERE user_id = 1 
-AND p_type = 'private'; 
+AND p_type = 'private';
+
+
+
+-- 11.Display all songs sorted alphabetically by name.
+SELECT song_id, song_name 
+FROM songs 
+ORDER BY song_name ASC; 
+
+
+-- 12.List the 5 most recently created playlists.
+SELECT playlist_id, playlist_name, created_at
+FROM playlists 
+ORDER BY created_at DESC
+LIMIT 5; 
+
+
+-- 13.Show users ordered by their last login time (most recent first).
+SELECT user_id, user_name, last_login
+FROM users
+WHERE last_login IS NOT NULL
+ORDER BY last_login DESC; 
 
