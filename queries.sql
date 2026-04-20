@@ -80,3 +80,45 @@ FROM users
 WHERE last_login IS NOT NULL
 ORDER BY last_login DESC; 
 
+
+-- 14.Count the total number of users.
+SELECT COUNT(*) 
+FROM users; 
+
+
+-- 15.Find how many songs exist in each album.
+SELECT a.album_id, COUNT(song_id) AS song_count
+FROM albums a
+LEFT JOIN songs s
+	ON a.album_id = s.album_id 
+GROUP BY a.album_id
+ORDER BY a.album_id ASC; 
+
+
+-- 16.Count how many playlists each user has created.
+SELECT user_id, COUNT(playlist_id) AS playlist_count
+FROM playlists 
+GROUP BY user_id 
+ORDER BY playlist_count DESC; 
+
+
+-- 17.Find the total number of plays for each song.
+SELECT s.song_id, s.song_name, COUNT(p.play_id) AS play_count
+FROM plays p
+JOIN songs s
+	ON p.song_id = s.song_id 
+GROUP BY s.song_id, s.song_name 	
+ORDER BY play_count DESC;
+
+
+-- 18.Determine the average number of plays per user.
+ SELECT AVG(play_count) AS avg_plays_per_user
+ FROM (
+ 	SELECT user_id, COUNT(*) AS play_count
+ 	FROM plays 
+ 	WHERE user_id IS NOT NULL
+ 	GROUP BY user_id
+ ) sub; 
+ 
+
+
