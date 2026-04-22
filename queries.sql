@@ -220,4 +220,33 @@ JOIN song_artists sa
 ORDER BY a.artist_id;  
 
 
+-- =====================================
+-- 7. MULTI-TABLE LOGIC
+-- =====================================
+-- 27.Find all songs that appear in the playlist with id 1. 
+SELECT s.song_id, s.song_name
+FROM songs s
+JOIN playlist_songs ps
+	ON s.song_id = ps.song_id
+WHERE ps.playlist_id = 1; 
+
+
+-- 28.List all users who have played the song with id 4.
+SELECT DISTINCT u.user_id, u.user_name
+FROM users u
+JOIN plays p
+	ON u.user_id = p.user_id
+WHERE p.song_id = 4
+ORDER BY user_id;
+
+
+-- 29.Show all playlists that contain songs by the artist with id 4.
+SELECT DISTINCT p.playlist_id, p.playlist_name 
+FROM playlists p
+JOIN playlist_songs ps
+	ON p.playlist_id = ps.playlist_id
+JOIN song_artists sa 
+	ON sa.song_id = ps.song_id
+WHERE sa.artist_id = 4
+ORDER BY p.playlist_id; 
 
