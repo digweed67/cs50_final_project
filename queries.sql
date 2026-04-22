@@ -119,6 +119,35 @@ ORDER BY play_count DESC;
  	WHERE user_id IS NOT NULL
  	GROUP BY user_id
  ) sub; 
+
+
+-- 19.List users who have created more than one playlist.
+SELECT p.user_id, u.user_name, COUNT(p.playlist_id) AS playlist_count
+FROM playlists p
+JOIN users u
+	ON p.user_id = u.user_id
+GROUP BY p.user_id, u.user_name
+HAVING COUNT(p.playlist_id) > 1
+ORDER BY p.user_id;
+
+
+-- 20.Show songs that have been played more than 5 times.
+SELECT s.song_id, s.song_name, COUNT(p.play_id) AS play_count
+FROM songs s
+JOIN plays p
+	ON s.song_id = p.song_id 
+GROUP BY s.song_id, s.song_name
+HAVING COUNT(p.play_id) > 5
+ORDER BY s.song_id;
  
+
+-- 21.Find albums that contain more than 2 songs.
+SELECT a.album_id, a.album_name, COUNT(s.song_id) AS song_count
+FROM albums a
+JOIN songs s 
+	ON a.album_id = s.album_id 
+GROUP BY a.album_id, a.album_name
+HAVING COUNT(s.song_id) > 2
+ORDER BY a.album_id;
 
 
