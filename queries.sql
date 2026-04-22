@@ -1,5 +1,9 @@
 -- In this SQL file, write (and comment!) the typical SQL queries users will run on your database
 
+-- =====================================
+-- 1. BASIC RETRIEVAL
+-- =====================================
+
 -- 1.List all users with their usernames and email addresses.
 SELECT user_name, email
 FROM users;
@@ -27,6 +31,10 @@ WHERE album_id IS NULL;
 -- 5.List all artists and their countries, including those with no country specified.
 SELECT artist_name, country
 FROM artists; 
+
+-- =====================================
+-- 2. FILTERING AND CONDITIONS
+-- =====================================
 
 
 -- 6.Find all users who have logged in within the last 2 days.
@@ -60,6 +68,9 @@ WHERE user_id = 1
 AND p_type = 'private';
 
 
+-- =====================================
+-- 3. SORTING AND LIMITING
+-- =====================================
 
 -- 11.Display all songs sorted alphabetically by name.
 SELECT song_id, song_name 
@@ -80,6 +91,10 @@ FROM users
 WHERE last_login IS NOT NULL
 ORDER BY last_login DESC; 
 
+
+-- =====================================
+-- 4. AGGREGATIONS
+-- =====================================
 
 -- 14.Count the total number of users.
 SELECT COUNT(*) 
@@ -109,6 +124,11 @@ JOIN songs s
 	ON p.song_id = s.song_id 
 GROUP BY s.song_id, s.song_name 	
 ORDER BY play_count DESC;
+
+
+-- =====================================
+-- 5. GROUPING AND HAVING
+-- =====================================
 
 
 -- 18.Determine the average number of plays per user.
