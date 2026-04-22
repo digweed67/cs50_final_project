@@ -170,4 +170,54 @@ GROUP BY a.album_id, a.album_name
 HAVING COUNT(s.song_id) > 2
 ORDER BY a.album_id;
 
+-- =====================================
+-- 6. JOINS
+-- =====================================
+
+-- 22.List all songs along with the names of their artists.
+SELECT a.artist_name, s.song_name
+FROM songs s 
+JOIN song_artists sa
+	ON sa.song_id = s.song_id
+JOIN artists a
+	ON a.artist_id = sa.artist_id
+ORDER BY a.artist_name, s.song_name; 
+
+
+-- 23.Display all playlists along with the username of the creator.
+SELECT u.user_name, p.playlist_name
+FROM playlists p
+JOIN users u
+	ON p.user_id = u.user_id
+ORDER BY u.user_name; 
+
+
+-- 24.Show all songs in each playlist (playlist name + song name).
+SELECT p.playlist_name, s.song_name
+FROM playlists p
+JOIN playlist_songs ps
+	ON p.playlist_id = ps.playlist_id 
+JOIN songs s
+	ON ps.song_id = s.song_id
+ORDER BY p.playlist_name, s.song_name; 
+
+
+-- 25.List all plays along with the username and song name.
+SELECT p.play_id, u.user_name, s.song_name
+FROM plays p
+JOIN users u 
+	ON u.user_id = p.user_id 
+JOIN songs s
+	ON s.song_id = p.song_id
+ORDER BY p.play_id;
+
+
+-- 26.Display all artists who have songs in the database.
+SELECT DISTINCT a.artist_id, a.artist_name
+FROM artists a
+JOIN song_artists sa 
+	ON a.artist_id = sa.artist_id
+ORDER BY a.artist_id;  
+
+
 
