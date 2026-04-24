@@ -327,3 +327,31 @@ FROM plays
 EXCEPT 
 SELECT song_id 
 FROM playlist_songs;
+
+-- =======================================
+-- 10. PATTERN MATCHING AND NULL HANDLING
+-- =======================================
+
+
+-- 37.Find all songs with names containing the word “Single”.
+SELECT song_name
+FROM songs 
+WHERE LOWER(song_name) LIKE '%single%';
+
+
+-- 38.Show songs where the album is missing.
+SELECT song_id, song_name
+FROM songs
+WHERE album_id IS NULL;
+
+
+-- 39.Replace NULL last_login values with a readable label like “Never logged in”.
+SELECT 
+	user_name, 
+	COALESCE(
+		TO_CHAR(last_login, 'YYYY-MM-DD HH24:MI:SS'),
+		'Never logged in'
+	)
+FROM users;
+
+
