@@ -250,3 +250,52 @@ JOIN song_artists sa
 WHERE sa.artist_id = 4
 ORDER BY p.playlist_id; 
 
+-- =====================================
+-- 8. SUBQUERIES
+-- =====================================
+
+-- 30.Find the song(s) with the highest number of plays.
+SELECT song_id, COUNT(*) AS plays_count
+FROM plays
+GROUP BY song_id
+HAVING COUNT(*) = (
+    SELECT MAX(play_count)
+    FROM (
+        SELECT COUNT(*) AS play_count
+        FROM plays
+        GROUP BY song_id
+    ) sub
+);
+
+
+-- 31.Retrieve users who have created the most playlists.
+SELECT user_id, COUNT(*) AS playlist_count
+FROM playlists 
+GROUP BY user_id
+HAVING COUNT(*) = (
+	SELECT MAX(playlist_count)
+		FROM (
+			SELECT user_id, COUNT(*) AS playlist_count
+			FROM playlists 
+			GROUP BY user_id
+		) sub
+);
+
+
+-- 32.Find songs that have never been played.
+SELECT song_id 
+FROM songs s
+WHERE NOT EXISTS (SELECT 1 FROM plays p WHERE s.song_id = p.song_id );
+
+
+-- 33.List playlists that contain more songs than the average playlist.
+SELECT playlist_id, COUNT(*) AS song_count
+FROM playlist_songs
+GROUP BY playlist_id
+HAVING COUNT(*) > (
+	SELECT AVG(song_count) AS avg_song_count
+	FROM (
+		SELECT COUNT(*) AS song_count
+		FROM playlist_songs
+		GROUP BY playlist_id) sub
+);
