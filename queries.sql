@@ -299,3 +299,31 @@ HAVING COUNT(*) > (
 		FROM playlist_songs
 		GROUP BY playlist_id) sub
 );
+
+-- =====================================
+-- 9. SET OPERATIONS
+-- =====================================
+
+-- 34.List all song IDs that appear in playlists or in plays.
+SELECT song_id 
+FROM playlist_songs 
+UNION 
+SELECT song_id 
+FROM plays; 
+
+
+-- 35.Find songs that are in playlists but have never been played.
+-- Result is none 
+SELECT song_id 
+FROM playlist_songs 
+EXCEPT 
+SELECT song_id 
+FROM plays; 
+
+
+-- 36.Find songs that have been played but are not in any playlist.
+SELECT song_id 
+FROM plays 
+EXCEPT 
+SELECT song_id 
+FROM playlist_songs;
