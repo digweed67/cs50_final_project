@@ -354,4 +354,41 @@ SELECT
 	)
 FROM users;
 
+-- =====================================
+-- 11. CASE / CONDITIONAL LOGIC
+-- =====================================
+
+
+-- 40.Categorize users as “Active” or “Moderate” or "Inactive" based on their number of plays.
+SELECT 
+	u.user_id,
+	u.user_name,
+	COUNT(p.play_id) AS total_plays,
+	CASE 
+		WHEN COUNT(p.play_id) >= 20 THEN 'Active'
+		WHEN COUNT(p.play_id) BETWEEN 10 AND 19 THEN 'Moderate'
+		ELSE 'Inactive'
+	END AS activity_level
+FROM users u
+LEFT JOIN plays p 
+	ON u.user_id = p.user_id
+GROUP BY u.user_id, u.user_name
+ORDER BY total_plays DESC; 
+
+
+-- 41.Classify songs as “Hit", "Popular” or “Unpopular” based on number of plays.
+SELECT 
+	s.song_id,
+	s.song_name,
+	COUNT(p.play_id) AS total_plays,
+	CASE 
+		WHEN COUNT(p.play_id) >= 50 THEN 'Hit'
+		WHEN COUNT(p.play_id) >= 14 THEN 'Popular'
+		ELSE 'Unpopular'
+	END AS popularity
+FROM songs s
+LEFT JOIN plays p
+	ON s.song_id = p.song_id 
+GROUP BY s.song_id, s.song_name 
+ORDER BY total_plays DESC; 
 
