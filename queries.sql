@@ -392,3 +392,121 @@ LEFT JOIN plays p
 GROUP BY s.song_id, s.song_name 
 ORDER BY total_plays DESC; 
 
+
+-- =========================================================
+-- 12. COMMON TABLE EXPRESSIONS (CTEs) AND WINDOW FUNCTIONS
+-- =========================================================
+
+-- 42.Find the top 5 users by total number of song plays, and include their usernames and play counts, including ties.
+WITH total_plays AS (
+	SELECT 	
+		user_id, 
+		COUNT(*) AS play_count
+	FROM plays 
+	GROUP BY user_id 
+), 
+ranked AS (
+	SELECT *, 
+			DENSE_RANK() OVER(ORDER BY play_count DESC) AS rnk
+	FROM total_plays
+)
+
+SELECT u.user_name, r.play_count, r.rnk
+FROM users u
+JOIN ranked r 
+	ON u.user_id = r.user_id
+WHERE r.rnk <= 5
+ORDER BY r.play_count DESC;
+
+
+-- 43.Show each playlist along with the total number of songs it contains and label empty playlists clearly.
+WITH total_songs AS (
+	SELECT 
+		playlist_id, 
+		COUNT(song_id) AS song_count
+	FROM playlist_songs 
+	GROUP BY playlist_id 
+)
+
+SELECT 
+	p.playlist_name,
+	p.playlist_id,
+	COALESCE(ts.song_count, 0) AS song_count,
+	CASE 
+		WHEN ts.song_count IS NULL THEN 'Empty playlist'
+		ELSE 'Contains songs'
+	END AS status
+FROM playlists p 
+LEFT JOIN total_songs ts
+	ON p.playlist_id = ts.playlist_id 
+ORDER BY song_count DESC;
+
+
+-- 44.Find the average number of songs per playlist, then list only playlists that exceed that average.
+WITH number_of_songs AS (
+	SELECT 
+		playlist_id,
+		COUNT(song_id) AS song_count
+	FROM playlist_songs 
+	GROUP BY playlist_id 
+),
+avg_songs AS (
+	SELECT 
+		ROUND(AVG(song_count),2) AS avg_song_count
+	FROM number_of_songs
+)
+
+SELECT  
+	ns.playlist_id, 
+	p.playlist_name, 
+	ns.song_count 
+FROM playlists p
+JOIN number_of_songs ns 
+	ON p.playlist_id  = ns.playlist_id
+CROSS JOIN avg_songs a
+WHERE ns.song_count > a.avg_song_count; 
+
+
+-- 45.For each user, calculate their total plays and rank them from highest to lowest.
+WITH total_plays AS (
+	SELECT 
+		user_id, 
+		COUNT(play_id) AS play_count
+	FROM plays 
+	GROUP BY user_id
+)
+SELECT 
+	tp.user_id,
+	u.user_name,
+	COALESCE(tp.play_count, 0) AS play_count,
+	DENSE_RANK () OVER (ORDER BY COALESCE(tp.play_count, 0) DESC) AS rnk
+FROM users u
+LEFT JOIN total_plays tp
+	ON u.user_id = tp.user_id;
+
+
+-- 46.List songs along with how many times they’ve been played, but only include songs above the average play count.
+WITH total_plays AS (
+	SELECT 
+		song_id,
+		COUNT(play_id) AS play_count
+	FROM plays 
+	GROUP BY song_id
+),
+avg_total_plays AS (
+	SELECT 
+		ROUND(AVG(play_count), 2) AS avg_play_count
+	FROM total_plays
+)
+SELECT 
+	tp.song_id,
+	s.song_name,
+	tp.play_count,
+	a.avg_play_count
+FROM songs s
+JOIN total_plays tp
+	ON s.song_id = tp.song_id 
+CROSS JOIN avg_total_plays a
+WHERE tp.play_count > a.avg_play_count
+ORDER BY tp.play_count DESC; 
+
