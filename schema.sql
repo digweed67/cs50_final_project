@@ -133,6 +133,58 @@ CREATE INDEX idx_playlist_songs_song_id ON playlist_songs(song_id);
 
 
 /* ================== VIEWS ================== */ 
+-- 47.Create a view that shows each song along with its artist(s) and album name(if any).
+CREATE OR REPLACE VIEW v_artist_album_song AS 
+	SELECT 
+		a.artist_name,
+		COALESCE(al.album_name, 'Single') AS album_name,
+		s.song_name 
+	FROM songs s
+	LEFT JOIN albums al
+		ON s.album_id = al.album_id
+	JOIN song_artists sa
+		ON sa.song_id = s.song_id
+	JOIN artists a
+		ON a.artist_id = sa.artist_id;
+
+
+-- 48.Create a view that summarizes total plays per song.
+
+CREATE OR REPLACE VIEW v_plays_per_song AS 
+	SELECT 
+		s.song_id,
+		s.song_name, 
+		COUNT(p.play_id) AS play_count
+	FROM songs s
+	LEFT JOIN plays p
+		ON s.song_id = p.song_id
+	GROUP BY s.song_id, s.song_name; 
+
+
+-- 49.Create a view that lists users and how many playlists they have created.
+
+CREATE OR REPLACE VIEW v_user_playlists AS 
+	SELECT 
+		u.user_id, 
+		u.user_name,
+		COUNT(p.playlist_name) AS playlist_count
+	FROM users u 
+	LEFT JOIN playlists p
+		ON u.user_id = p.user_id
+	GROUP BY u.user_id, u.user_name;
+
+
+-- 50. Create a view that only shows public playlists and enforce that no private playlist can be inserted through it.
+CREATE OR REPLACE VIEW v_public_playlists AS
+	SELECT 
+	    playlist_id,
+	    user_id,
+	    playlist_name,
+	    created_at,
+	    p_type
+	FROM playlists
+	WHERE p_type = 'public'
+	WITH CHECK OPTION;
 
 
 /* ================== TRIGGERS ================== */ 
