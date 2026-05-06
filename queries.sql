@@ -546,3 +546,95 @@ SELECT * FROM playlists WHERE playlist_name = 'Summer Party';
 DELETE FROM playlists WHERE playlist_id = 13; 
 
 
+-- =========================================================
+-- 14. ADVANCED JOINS  
+-- =========================================================
+
+-- 51.List all songs along with their album, artist, and total play count in a single query.
+WITH play_counts AS (
+	SELECT 
+		song_id,
+		COUNT(*) AS play_count
+	FROM plays
+	GROUP BY song_id
+)
+SELECT
+	s.song_name, 
+	COALESCE(a.album_name, 'Single') AS album_name, 
+	ar.artist_name,
+	COALESCE(pc.play_count, 0) AS play_count
+FROM songs s
+LEFT JOIN albums a
+	ON s.album_id = a.album_id 
+JOIN song_artists sa
+	ON s.song_id = sa.song_id
+JOIN artists ar
+	ON sa.artist_id = ar.artist_id 
+LEFT JOIN play_counts pc
+	ON s.song_id = pc.song_id
+GROUP BY s.song_name, a.album_name, ar.artist_name, pc.play_count 
+ORDER BY play_count DESC; 
+
+
+-- 52.Find all users who have created playlists containing songs they have also played.
+SELECT 
+    u.user_id,
+    u.user_name
+FROM users u
+WHERE EXISTS (
+    SELECT 1
+    FROM playlists p
+    JOIN playlist_songs ps
+        ON ps.playlist_id = p.playlist_id
+    JOIN plays pl
+        ON pl.song_id = ps.song_id
+    WHERE p.user_id = u.user_id
+      AND pl.user_id = u.user_id
+);
+
+
+-- 53.Show all pairs of users who have at least one song in common across their playlists and count them.
+
+WITH users_songs AS (
+	SELECT 
+		p.user_id,
+		ps.song_id
+	FROM playlists p
+	JOIN playlist_songs ps
+		ON p.playlist_id = ps.playlist_id
+)
+
+SELECT 
+	a.user_id AS user_a,
+	b.user_id AS user_b,
+	COUNT(*) AS matching_song_count
+FROM users_songs a 
+JOIN users_songs b 
+	ON a.song_id = b.song_id 
+	AND a.user_id < b.user_id
+GROUP BY a.user_id, b.user_id; 
+
+
+-- 54.List playlists that contain songs from more than one artist.
+ SELECT 
+ 	p.playlist_name
+ FROM playlists p
+ JOIN playlist_songs ps
+ 	ON p.playlist_id = ps.playlist_id
+ JOIN song_artists sa
+ 	ON ps.song_id = sa.song_id
+GROUP BY p.playlist_name
+HAVING COUNT(DISTINCT sa.artist_id) > 1; 
+
+
+-- 55.Find songs that appear in multiple playlists, along with how many playlists they appear in.
+SELECT
+	s.song_id,
+	s.song_name,
+	COUNT(DISTINCT playlist_id) AS playlist_count 
+FROM playlist_songs ps
+JOIN songs s
+	ON s.song_id = ps.song_id
+GROUP BY s.song_id, s.song_name 
+HAVING COUNT(DISTINCT playlist_id) > 1
+ORDER BY playlist_count DESC; 
