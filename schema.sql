@@ -490,54 +490,6 @@ INSERT INTO playlist_songs (playlist_id, song_id, position) VALUES
 
 
 /* ---------- EXTRA PLAYLIST_SONGS ---------- */
-INSERT INTO playlist_songs (playlist_id, song_id, position) VALUES
-
--- Coding Mode
-(11, 14, 3),
-(11, 15, 4),
-(11, 5, 5),
-(11, 7, 6),
-
--- Rainy Days
-(23, 2, 1),
-(23, 17, 2),
-(23, 18, 3),
-
--- Top Hits
-(24, 1, 1),
-(24, 4, 2),
-(24, 7, 3),
-(24, 14, 4),
-(24, 21, 5),
-
--- Deep Focus
-(25, 15, 1),
-(25, 16, 2),
-(25, 18, 3),
-(25, 20, 4),
-
--- Summer Drive
-(26, 5, 1),
-(26, 6, 2),
-(26, 12, 3),
-(26, 21, 4),
-
--- Lofi Nights
-(20, 17, 1),
-(20, 18, 2),
-(20, 19, 3),
-(20, 20, 4),
-
--- Synthwave
-(21, 11, 1),
-(21, 12, 2),
-(21, 14, 3),
-(21, 15, 4),
-
--- Morning Coffee
-(19, 3, 1),
-(19, 9, 2),
-(19, 17, 3);
 
 -- Delete seed data that was wrong:
 DELETE FROM playlist_songs
@@ -557,7 +509,7 @@ WHERE playlist_id IN (
 );
 
 
--- Retry insert:
+-- Correct insert:
 
 INSERT INTO playlist_songs (playlist_id, song_id, position) VALUES
 
