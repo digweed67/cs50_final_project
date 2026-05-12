@@ -638,3 +638,162 @@ JOIN songs s
 GROUP BY s.song_id, s.song_name 
 HAVING COUNT(DISTINCT playlist_id) > 1
 ORDER BY playlist_count DESC; 
+
+-- =========================================================
+-- 15. SECURITY & GRANTS   
+-- =========================================================
+
+-- 56.Create a read-only role that can only view songs, artists, and albums but cannot modify any data.
+DROP ROLE IF EXISTS read_only;
+DROP USER IF EXISTS alice;
+
+CREATE ROLE read_only; 
+
+GRANT USAGE ON SCHEMA public TO read_only;
+
+GRANT SELECT ON TABLE songs, artists, albums TO read_only;
+
+CREATE USER alice WITH PASSWORD 'alice_pass';
+
+GRANT read_only TO alice; 
+
+-- Test to see if grants work as intended: 
+SET ROLE alice; 
+-- This works as user alice has read permissions: 
+SELECT * FROM songs; 
+
+-- This doesn't work because she doesn't have insert permissions 
+-- we get: ERROR: permission denied for table songs. 
+INSERT INTO songs (album_id, song_name)
+VALUES (NULL, 'First Single');
+
+RESET ROLE;
+-- 57.Grant a specific user permission to insert plays but not delete them.
+CREATE ROLE insert_plays;
+
+GRANT USAGE ON SCHEMA public TO insert_plays;
+-- it wasn't allowing us to access nextval() so we need to grant usage
+GRANT USAGE, SELECT ON SEQUENCE plays_play_id_seq TO insert_plays;
+GRANT INSERT ON TABLE public.plays TO insert_plays;
+
+CREATE USER admin WITH PASSWORD 'admin_pass';
+
+GRANT insert_plays TO admin; 
+
+-- We test if the grant permission works by setting the role to admin:
+SET ROLE admin;
+
+-- The insert succeeds:
+INSERT INTO public.plays (user_id, song_id)
+VALUES (1, 1);
+
+-- This fails (ERROR: permission denied for table plays):
+SELECT * FROM plays; 
+
+-- we reset back to super role
+RESET ROLE;
+-- we find the play id for the inserted row to delete it 
+SELECT * FROM plays ORDER BY played_at DESC;
+
+DELETE FROM plays 
+WHERE play_id = 186; 
+
+
+
+-- =========================================================
+-- 16. TRANSACTIONS & ISOLATION   
+-- =========================================================
+
+-- 58.Simulate creating a playlist and adding songs to it, ensuring that if any insert fails, nothing is saved.
+BEGIN; 
+
+-- create a new playlist and return its id 
+WITH new_playlist AS(
+INSERT INTO playlists (user_id, playlist_name, p_type)
+VALUES(1, 'Meditation Tunes', 'public')
+RETURNING playlist_id
+)
+
+
+-- ERROR: insert or update on table "playlist_songs" violates foreign key constraint ", song 999999 doesn't exist
+INSERT INTO playlist_songs (playlist_id, song_id, position)
+SELECT playlist_id, 999999, 1 FROM new_playlist;
+
+COMMIT; -- is ignored because transaction has been aborted 
+
+-- Try to select something now and this happens:
+-- ERROR: current transaction is aborted, commands ignored until end of transaction block
+SELECT * FROM playlists WHERE playlist_name = 'Meditation Tunes';
+
+-- So I need to reset/rollback this transaction:
+ROLLBACK; 
+
+-- Now I try to re-run the select:
+SELECT * FROM playlists WHERE playlist_name = 'Meditation Tunes';
+-- And the playlist was never commited, so it does not exist  
+
+
+-- Correct transaction:
+BEGIN; 
+
+-- create a new playlist and return its id 
+WITH new_playlist AS(
+INSERT INTO playlists (user_id, playlist_name, p_type)
+VALUES(1, 'Meditation Tunes', 'public')
+RETURNING playlist_id
+)
+-- insert the new playlist and add songs into playlist songs 
+INSERT INTO playlist_songs (playlist_id, song_id, position)
+SELECT playlist_id, 10, 1 FROM new_playlist;
+
+
+COMMIT; -- this does run now 
+
+-- Check the playlist and songs exist: 
+SELECT * FROM playlists WHERE playlist_name = 'Meditation Tunes';
+
+SELECT ps.*
+FROM playlist_songs ps
+JOIN playlists p ON p.playlist_id = ps.playlist_id
+WHERE p.playlist_name = 'Meditation Tunes';
+
+-- Delete this new data:
+DELETE FROM playlists WHERE playlist_name = 'Meditation Tunes';
+-- the delete from playlist_songs happens automatically due to on delete cascade 
+
+
+
+-- 59.Update a playlist name and log the change, then roll back the transaction and verify the log behavior.
+
+BEGIN; 
+
+-- this should fire the trigger update playlist
+UPDATE playlists 
+SET playlist_name = 'New Name'
+WHERE playlist_id = 1; 
+
+ROLLBACK; -- the log won't happen due to rollback and atomicity
+
+
+
+-- 60.Delete a song and observe how related records behave across all tables inside a transaction before committing.
+BEGIN; 
+
+
+DELETE FROM songs WHERE song_id = 4; 
+
+-- We run this before rollback/committing and the song has been deleted: 
+SELECT * FROM songs WHERE song_id = 4;
+
+SELECT * FROM playlist_songs WHERE song_id = 4;
+
+-- now we run the rollback
+
+ROLLBACK; 
+
+-- we run the select statements again to make sure song_id 4 is still there and it is
+SELECT * FROM songs WHERE song_id = 4;
+
+SELECT * FROM playlist_songs WHERE song_id = 4;
+ 
+
