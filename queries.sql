@@ -797,3 +797,52 @@ SELECT * FROM songs WHERE song_id = 4;
 SELECT * FROM playlist_songs WHERE song_id = 4;
  
 
+
+-- =========================================================
+-- 17. TEST TRIGGERS   
+-- =========================================================
+
+
+-- 61. Test the "create playlist" trigger.
+
+INSERT INTO playlists (user_id, playlist_name, p_type)
+VALUES (2, 'My Daily Mix', 'public'); 
+
+SELECT * FROM playlists WHERE playlist_name = 'My Daily Mix' AND user_id = 2; 
+SELECT * FROM user_logs; 
+
+
+-- 62. Test the "rename playlist" trigger.
+UPDATE playlists
+SET playlist_name = 'My Monthly Mix'
+WHERE playlist_name = 'My Daily Mix'
+	AND user_id = 2; 
+
+SELECT * FROM playlists WHERE playlist_name = 'My Monthly Mix' AND user_id = 2; 
+SELECT * FROM user_logs;
+
+
+-- 63. Test the "delete playlist" trigger.
+DELETE FROM playlists 
+WHERE playlist_name = 'My Monthly Mix' 
+	AND user_id = 2;
+
+SELECT * FROM playlists WHERE playlist_name = 'My Monthly Mix' AND user_id = 2; 
+SELECT * FROM user_logs;
+
+
+-- 64. Test the "add song to playlist" trigger.
+
+INSERT INTO playlist_songs (playlist_id, song_id, position)
+VALUES (1, 2, 4);
+
+SELECT * FROM user_logs;
+SELECT * FROM playlist_songs WHERE playlist_id = 1;
+
+-- 65. Test the "delete song from playlist" trigger. 
+DELETE FROM playlist_songs 
+WHERE playlist_id = 1
+	AND song_id = 2; 
+
+SELECT * FROM user_logs;
+SELECT * FROM playlist_songs WHERE playlist_id = 1;
