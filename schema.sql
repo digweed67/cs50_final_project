@@ -539,6 +539,75 @@ INSERT INTO playlist_songs (playlist_id, song_id, position) VALUES
 (19, 9, 2),
 (19, 17, 3);
 
+-- Delete seed data that was wrong:
+DELETE FROM playlist_songs
+WHERE playlist_id IN (
+    SELECT playlist_id
+    FROM playlists
+    WHERE playlist_name IN (
+        'Coding Mode',
+        'Rainy Days',
+        'Top Hits',
+        'Deep Focus',
+        'Summer Drive',
+        'Lofi Nights',
+        'Synthwave',
+        'Morning Coffee'
+    )
+);
+
+
+-- Retry insert:
+
+INSERT INTO playlist_songs (playlist_id, song_id, position) VALUES
+
+-- Coding Mode
+(19, 14, 3),
+(19, 15, 4),
+(19, 5, 5),
+(19, 7, 6),
+
+-- Rainy Days
+(20, 2, 1),
+(20, 17, 2),
+(20, 18, 3),
+
+-- Top Hits
+(21, 1, 1),
+(21, 4, 2),
+(21, 7, 3),
+(21, 14, 4),
+(21, 21, 5),
+
+-- Deep Focus
+(22, 15, 1),
+(22, 16, 2),
+(22, 18, 3),
+(22, 20, 4),
+
+-- Summer Drive
+(23, 5, 1),
+(23, 6, 2),
+(23, 12, 3),
+(23, 21, 4),
+
+-- Lofi Nights
+(24, 17, 1),
+(24, 18, 2),
+(24, 19, 3),
+(24, 20, 4),
+
+-- Synthwave
+(25, 11, 1),
+(25, 12, 2),
+(25, 14, 3),
+(25, 15, 4),
+
+-- Morning Coffee
+(26, 3, 1),
+(26, 9, 2),
+(26, 17, 3);
+
 
 /* ---------- PLAYS (BASE DATA) ---------- */
 INSERT INTO plays (user_id, song_id, played_at) VALUES
