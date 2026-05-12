@@ -340,6 +340,14 @@ INSERT INTO users (user_name, email, last_login) VALUES
 ('irene', 'irene@example.com', CURRENT_TIMESTAMP),
 ('jack', 'jack@example.com', CURRENT_TIMESTAMP - INTERVAL '10 hours');
 
+-- Add extra seed data for users:
+INSERT INTO users (user_name, email, last_login) VALUES
+('mia', 'mia@example.com', NULL),
+('noah', 'noah@example.com', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+('oliver', 'oliver@example.com', CURRENT_TIMESTAMP - INTERVAL '2 hours'),
+('sophia', 'sophia@example.com', CURRENT_TIMESTAMP - INTERVAL '90 days'),
+('liam', 'liam@example.com', CURRENT_TIMESTAMP - INTERVAL '45 days');
+
 
 /* ---------- ARTISTS ---------- */
 INSERT INTO artists (artist_name, country) VALUES
@@ -348,12 +356,24 @@ INSERT INTO artists (artist_name, country) VALUES
 ('Daft Punk', 'FR'),
 ('Unknown Indie', NULL);
 
+-- Add extra seed data for artists:
+INSERT INTO artists (artist_name, country) VALUES
+('Neon Dreams', 'CA'),
+('Skyline Echo', NULL),
+('Velvet Noise', 'AU'),
+('Mono Signal', 'DE');
 
 /* ---------- ALBUMS ---------- */
 INSERT INTO albums (album_name, label, release_year) VALUES
 ('Parachutes', 'Parlophone', 2000),
 ('1989', 'Big Machine', 2014),
 ('Random Access Memories', 'Columbia', 2013);
+
+-- Add more seed data for albums:
+INSERT INTO albums (album_name, label, release_year) VALUES
+('Midnight Echoes', 'IndieWave', 1998),
+('Future Silence', NULL, 2022),
+('Acoustic Sessions', 'BlueRoom', 2007);
 
 
 /* ---------- SONGS ---------- */
