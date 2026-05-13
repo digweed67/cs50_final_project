@@ -10,6 +10,7 @@ FROM users;
 
 
 -- 2.Show all songs along with their album names (including singles which don't belong to any albums).
+-- LEFT JOIN is used so songs without an album still appear in the results.
 SELECT song_name, album_name
 FROM songs s
 LEFT JOIN albums a
@@ -17,6 +18,7 @@ LEFT JOIN albums a
 
 
 -- 3. Display all songs that do not belong to any album.
+-- IS NULL is used to find songs with no album_id 
 SELECT song_name
 FROM songs
 WHERE album_id IS NULL; 
@@ -26,12 +28,14 @@ WHERE album_id IS NULL;
 SELECT artist_name, country
 FROM artists; 
 
+
+
 -- =====================================
 -- 2. FILTERING AND CONDITIONS
 -- =====================================
 
-
 -- 5.Find all users who have logged in within the last 2 days.
+-- CURRENT_TIMESTAMP AND INTERVAL filter users who have logged in within the rolling 48h window.
 SELECT user_id, user_name, last_login
 FROM users
 WHERE last_login >= CURRENT_TIMESTAMP - INTERVAL '2 days'; 
@@ -61,9 +65,10 @@ WHERE last_login IS NULL;
 
 
 -- 9.List the 5 most recently created playlists.
+-- We use a secondary sort (playlist_id) to make sure results are deterministic if there's a tie
 SELECT playlist_id, playlist_name, created_at
 FROM playlists 
-ORDER BY created_at DESC
+ORDER BY created_at DESC, playlist_id DESC
 LIMIT 5;  
 
 
@@ -71,13 +76,14 @@ LIMIT 5;
 -- 4. AGGREGATIONS
 -- ===================================== 
 
-
 -- 10.Find how many songs exist in each album.
-SELECT a.album_id, COUNT(song_id) AS song_count
+-- Left join includes album with no matching songs (null) 
+-- count(song_id) counts non null values, so albums with no matching songs return 0.
+SELECT a.album_id, a.album_name, COUNT(song_id) AS song_count
 FROM albums a
 LEFT JOIN songs s
 	ON a.album_id = s.album_id 
-GROUP BY a.album_id
+GROUP BY a.album_id, a.album_name
 ORDER BY a.album_id ASC;  
 
 
