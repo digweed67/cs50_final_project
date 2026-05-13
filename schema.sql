@@ -376,6 +376,9 @@ INSERT INTO albums (album_name, label, release_year) VALUES
 ('Future Silence', NULL, 2022),
 ('Acoustic Sessions', 'BlueRoom', 2007);
 
+/* ---------- ALBUM WITH NO SONGS ---------- */
+INSERT INTO albums (album_name, label, release_year)
+VALUES ('Unreleased Vault', 'IndieWave', 2024);
 
 /* ---------- SONGS ---------- */
 INSERT INTO songs (album_id, song_name) VALUES
