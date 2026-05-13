@@ -87,7 +87,9 @@ GROUP BY a.album_id, a.album_name
 ORDER BY a.album_id ASC;  
 
 
--- 11.Find the total number of plays for each song.
+-- 11.Find the total number of plays for each song, with at least 1 play.
+-- Only includes songs that have at least one play record.
+-- Inner join filters out songs with zero plays.
 SELECT s.song_id, s.song_name, COUNT(p.play_id) AS play_count
 FROM plays p
 JOIN songs s
@@ -96,12 +98,14 @@ GROUP BY s.song_id, s.song_name
 ORDER BY play_count DESC;
 
 
+
 -- =====================================
 -- 5. GROUPING AND HAVING
 -- =====================================
 
-
 -- 12.Show songs that have been played more than 5 times.
+-- Inner join prevents songs with zero plays to be included
+-- having filters aggregated results, so once all plays are counted, select those higher than 5
 SELECT s.song_id, s.song_name, COUNT(p.play_id) AS play_count
 FROM songs s
 JOIN plays p
@@ -111,11 +115,14 @@ HAVING COUNT(p.play_id) > 5
 ORDER BY s.song_id;
  
 
--- 13.Find albums that contain more than 2 songs.
+-- 13.Find albums release after 2000 and with more than 2 songs.
+-- Where filters only the albums released after 2000 first, before grouping.
+-- After grouping, having filters those albums released after 2000 that have >2 songs. 
 SELECT a.album_id, a.album_name, COUNT(s.song_id) AS song_count
 FROM albums a
 JOIN songs s 
 	ON a.album_id = s.album_id 
+WHERE a.release_year > 2000
 GROUP BY a.album_id, a.album_name
 HAVING COUNT(s.song_id) > 2
 ORDER BY a.album_id;
