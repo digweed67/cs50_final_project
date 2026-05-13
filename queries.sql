@@ -202,6 +202,8 @@ WHERE ps.playlist_id = 1;
 
 
 -- 20.List all users who have played the song with id 4.
+-- A user can have many plays for the same song, so join produces duplicates 
+-- We use distinct to return each user only once  
 SELECT DISTINCT u.user_id, u.user_name
 FROM users u
 JOIN plays p
@@ -220,12 +222,17 @@ JOIN song_artists sa
 WHERE sa.artist_id = 4
 ORDER BY p.playlist_id; 
 
+
+
 -- =====================================
 -- 8. SUBQUERIES
 -- =====================================
 
-
 -- 22.Retrieve users who have created the most playlists.
+-- The inner query (derived table) produces a temporary table  with user id and playlist count 
+-- MAX(playlist_count) returns highest count as a single scalar value (the max value out of playlist count)
+-- Outer query groups playlists by user and filters those whose count matches the maximum.
+-- Demonstrates nested subquery logic  
 SELECT user_id, COUNT(*) AS playlist_count
 FROM playlists 
 GROUP BY user_id
