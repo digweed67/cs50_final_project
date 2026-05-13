@@ -13,22 +13,16 @@ FROM users;
 SELECT song_name, album_name
 FROM songs s
 LEFT JOIN albums a
-	ON s.album_id = a.album_id; 
+	ON s.album_id = a.album_id;  
 
 
--- 3.Retrieve all playlists created by user_id 3. 
-SELECT playlist_id, playlist_name
-FROM playlists 
-WHERE user_id = 3; 
-
-
--- 4. Display all songs that do not belong to any album.
+-- 3. Display all songs that do not belong to any album.
 SELECT song_name
 FROM songs
 WHERE album_id IS NULL; 
 
 
--- 5.List all artists and their countries, including those with no country specified.
+-- 4.List all artists and their countries, including those with no country specified.
 SELECT artist_name, country
 FROM artists; 
 
@@ -37,87 +31,57 @@ FROM artists;
 -- =====================================
 
 
--- 6.Find all users who have logged in within the last 2 days.
+-- 5.Find all users who have logged in within the last 2 days.
 SELECT user_id, user_name, last_login
 FROM users
 WHERE last_login >= CURRENT_TIMESTAMP - INTERVAL '2 days'; 
 
 
--- 7.	Retrieve all playlists that are public.
+-- 6.	Retrieve all playlists that are public.
 SELECT playlist_id, playlist_name, user_id
 FROM playlists
 WHERE p_type = 'public'; 
 
 
--- 8.Show all albums released after 2010.
+-- 7.Show all albums released after 2010.
 SELECT album_id, album_name, release_year
 FROM albums 
 WHERE release_year > 2010; 
 
 
--- 9.List all users who have never logged in.
+-- 8.List all users who have never logged in.
 SELECT user_id, user_name 
 FROM users
 WHERE last_login IS NULL; 
 
 
--- 10.Find all playlists created by user 1 that are private.
-SELECT playlist_id, playlist_name
-FROM playlists
-WHERE user_id = 1 
-AND p_type = 'private';
-
-
 -- =====================================
 -- 3. SORTING AND LIMITING
--- =====================================
-
--- 11.Display all songs sorted alphabetically by name.
-SELECT song_id, song_name 
-FROM songs 
-ORDER BY song_name ASC; 
+-- ===================================== 
 
 
--- 12.List the 5 most recently created playlists.
+-- 9.List the 5 most recently created playlists.
 SELECT playlist_id, playlist_name, created_at
 FROM playlists 
 ORDER BY created_at DESC
-LIMIT 5; 
-
-
--- 13.Show users ordered by their last login time (most recent first).
-SELECT user_id, user_name, last_login
-FROM users
-WHERE last_login IS NOT NULL
-ORDER BY last_login DESC; 
+LIMIT 5;  
 
 
 -- =====================================
 -- 4. AGGREGATIONS
--- =====================================
-
--- 14.Count the total number of users.
-SELECT COUNT(*) 
-FROM users; 
+-- ===================================== 
 
 
--- 15.Find how many songs exist in each album.
+-- 10.Find how many songs exist in each album.
 SELECT a.album_id, COUNT(song_id) AS song_count
 FROM albums a
 LEFT JOIN songs s
 	ON a.album_id = s.album_id 
 GROUP BY a.album_id
-ORDER BY a.album_id ASC; 
+ORDER BY a.album_id ASC;  
 
 
--- 16.Count how many playlists each user has created.
-SELECT user_id, COUNT(playlist_id) AS playlist_count
-FROM playlists 
-GROUP BY user_id 
-ORDER BY playlist_count DESC; 
-
-
--- 17.Find the total number of plays for each song.
+-- 11.Find the total number of plays for each song.
 SELECT s.song_id, s.song_name, COUNT(p.play_id) AS play_count
 FROM plays p
 JOIN songs s
@@ -131,27 +95,7 @@ ORDER BY play_count DESC;
 -- =====================================
 
 
--- 18.Determine the average number of plays per user.
- SELECT AVG(play_count) AS avg_plays_per_user
- FROM (
- 	SELECT user_id, COUNT(*) AS play_count
- 	FROM plays 
- 	WHERE user_id IS NOT NULL
- 	GROUP BY user_id
- ) sub; 
-
-
--- 19.List users who have created more than one playlist.
-SELECT p.user_id, u.user_name, COUNT(p.playlist_id) AS playlist_count
-FROM playlists p
-JOIN users u
-	ON p.user_id = u.user_id
-GROUP BY p.user_id, u.user_name
-HAVING COUNT(p.playlist_id) > 1
-ORDER BY p.user_id;
-
-
--- 20.Show songs that have been played more than 5 times.
+-- 12.Show songs that have been played more than 5 times.
 SELECT s.song_id, s.song_name, COUNT(p.play_id) AS play_count
 FROM songs s
 JOIN plays p
@@ -161,7 +105,7 @@ HAVING COUNT(p.play_id) > 5
 ORDER BY s.song_id;
  
 
--- 21.Find albums that contain more than 2 songs.
+-- 13.Find albums that contain more than 2 songs.
 SELECT a.album_id, a.album_name, COUNT(s.song_id) AS song_count
 FROM albums a
 JOIN songs s 
@@ -174,7 +118,7 @@ ORDER BY a.album_id;
 -- 6. JOINS
 -- =====================================
 
--- 22.List all songs along with the names of their artists.
+-- 14.List all songs along with the names of their artists.
 SELECT a.artist_name, s.song_name
 FROM songs s 
 JOIN song_artists sa
@@ -184,7 +128,7 @@ JOIN artists a
 ORDER BY a.artist_name, s.song_name; 
 
 
--- 23.Display all playlists along with the username of the creator.
+-- 15.Display all playlists along with the username of the creator.
 SELECT u.user_name, p.playlist_name
 FROM playlists p
 JOIN users u
@@ -192,7 +136,7 @@ JOIN users u
 ORDER BY u.user_name; 
 
 
--- 24.Show all songs in each playlist (playlist name + song name).
+-- 16.Show all songs in each playlist (playlist name + song name).
 SELECT p.playlist_name, s.song_name
 FROM playlists p
 JOIN playlist_songs ps
@@ -202,7 +146,7 @@ JOIN songs s
 ORDER BY p.playlist_name, s.song_name; 
 
 
--- 25.List all plays along with the username and song name.
+-- 17.List all plays along with the username and song name.
 SELECT p.play_id, u.user_name, s.song_name
 FROM plays p
 JOIN users u 
@@ -212,7 +156,7 @@ JOIN songs s
 ORDER BY p.play_id;
 
 
--- 26.Display all artists who have songs in the database.
+-- 18.Display all artists who have songs in the database.
 SELECT DISTINCT a.artist_id, a.artist_name
 FROM artists a
 JOIN song_artists sa 
@@ -223,7 +167,7 @@ ORDER BY a.artist_id;
 -- =====================================
 -- 7. MULTI-TABLE LOGIC
 -- =====================================
--- 27.Find all songs that appear in the playlist with id 1. 
+-- 19.Find all songs that appear in the playlist with id 1. 
 SELECT s.song_id, s.song_name
 FROM songs s
 JOIN playlist_songs ps
@@ -231,7 +175,7 @@ JOIN playlist_songs ps
 WHERE ps.playlist_id = 1; 
 
 
--- 28.List all users who have played the song with id 4.
+-- 20.List all users who have played the song with id 4.
 SELECT DISTINCT u.user_id, u.user_name
 FROM users u
 JOIN plays p
@@ -240,7 +184,7 @@ WHERE p.song_id = 4
 ORDER BY user_id;
 
 
--- 29.Show all playlists that contain songs by the artist with id 4.
+-- 21.Show all playlists that contain songs by the artist with id 4.
 SELECT DISTINCT p.playlist_id, p.playlist_name 
 FROM playlists p
 JOIN playlist_songs ps
@@ -254,21 +198,8 @@ ORDER BY p.playlist_id;
 -- 8. SUBQUERIES
 -- =====================================
 
--- 30.Find the song(s) with the highest number of plays.
-SELECT song_id, COUNT(*) AS plays_count
-FROM plays
-GROUP BY song_id
-HAVING COUNT(*) = (
-    SELECT MAX(play_count)
-    FROM (
-        SELECT COUNT(*) AS play_count
-        FROM plays
-        GROUP BY song_id
-    ) sub
-);
 
-
--- 31.Retrieve users who have created the most playlists.
+-- 22.Retrieve users who have created the most playlists.
 SELECT user_id, COUNT(*) AS playlist_count
 FROM playlists 
 GROUP BY user_id
@@ -282,13 +213,13 @@ HAVING COUNT(*) = (
 );
 
 
--- 32.Find songs that have never been played.
+-- 23.Find songs that have never been played.
 SELECT song_id 
 FROM songs s
 WHERE NOT EXISTS (SELECT 1 FROM plays p WHERE s.song_id = p.song_id );
 
 
--- 33.List playlists that contain more songs than the average playlist.
+-- 24.List playlists that contain more songs than the average playlist.
 SELECT playlist_id, COUNT(*) AS song_count
 FROM playlist_songs
 GROUP BY playlist_id
@@ -304,7 +235,7 @@ HAVING COUNT(*) > (
 -- 9. SET OPERATIONS
 -- =====================================
 
--- 34.List all song IDs that appear in playlists or in plays.
+-- 25.List all song IDs that appear in playlists or in plays.
 SELECT song_id 
 FROM playlist_songs 
 UNION 
@@ -312,8 +243,7 @@ SELECT song_id
 FROM plays; 
 
 
--- 35.Find songs that are in playlists but have never been played.
--- Result is none 
+-- 26.Find songs that are in playlists but have never been played. 
 SELECT song_id 
 FROM playlist_songs 
 EXCEPT 
@@ -321,31 +251,25 @@ SELECT song_id
 FROM plays; 
 
 
--- 36.Find songs that have been played but are not in any playlist.
-SELECT song_id 
-FROM plays 
-EXCEPT 
-SELECT song_id 
-FROM playlist_songs;
 
 -- =======================================
 -- 10. PATTERN MATCHING AND NULL HANDLING
 -- =======================================
 
 
--- 37.Find all songs with names containing the word “Single”.
+-- 27.Find all songs with names containing the word “Single”.
 SELECT song_name
 FROM songs 
 WHERE LOWER(song_name) LIKE '%single%';
 
 
--- 38.Show songs where the album is missing.
+-- 28.Show songs where the album is missing.
 SELECT song_id, song_name
 FROM songs
 WHERE album_id IS NULL;
 
 
--- 39.Replace NULL last_login values with a readable label like “Never logged in”.
+-- 29.Replace NULL last_login values with a readable label like “Never logged in”.
 SELECT 
 	user_name, 
 	COALESCE(
@@ -359,7 +283,7 @@ FROM users;
 -- =====================================
 
 
--- 40.Categorize users as “Active” or “Moderate” or "Inactive" based on their number of plays.
+-- 30.Categorize users as “Active” or “Moderate” or "Inactive" based on their number of plays.
 SELECT 
 	u.user_id,
 	u.user_name,
@@ -375,29 +299,14 @@ LEFT JOIN plays p
 GROUP BY u.user_id, u.user_name
 ORDER BY total_plays DESC; 
 
-
--- 41.Classify songs as “Hit", "Popular” or “Unpopular” based on number of plays.
-SELECT 
-	s.song_id,
-	s.song_name,
-	COUNT(p.play_id) AS total_plays,
-	CASE 
-		WHEN COUNT(p.play_id) >= 50 THEN 'Hit'
-		WHEN COUNT(p.play_id) >= 14 THEN 'Popular'
-		ELSE 'Unpopular'
-	END AS popularity
-FROM songs s
-LEFT JOIN plays p
-	ON s.song_id = p.song_id 
-GROUP BY s.song_id, s.song_name 
-ORDER BY total_plays DESC; 
+ 
 
 
 -- =========================================================
 -- 12. COMMON TABLE EXPRESSIONS (CTEs) AND WINDOW FUNCTIONS
 -- =========================================================
 
--- 42.Find the top 5 users by total number of song plays, and include their usernames and play counts, including ties.
+-- 31.Find the top 5 users by total number of song plays, and include their usernames and play counts, including ties.
 WITH total_plays AS (
 	SELECT 	
 		user_id, 
@@ -419,7 +328,7 @@ WHERE r.rnk <= 5
 ORDER BY r.play_count DESC;
 
 
--- 43.Show each playlist along with the total number of songs it contains and label empty playlists clearly.
+-- 32.Show each playlist along with the total number of songs it contains and label empty playlists clearly.
 WITH total_songs AS (
 	SELECT 
 		playlist_id, 
@@ -442,7 +351,7 @@ LEFT JOIN total_songs ts
 ORDER BY song_count DESC;
 
 
--- 44.Find the average number of songs per playlist, then list only playlists that exceed that average.
+-- 33.Find the average number of songs per playlist, then list only playlists that exceed that average.
 WITH number_of_songs AS (
 	SELECT 
 		playlist_id,
@@ -467,7 +376,7 @@ CROSS JOIN avg_songs a
 WHERE ns.song_count > a.avg_song_count; 
 
 
--- 45.For each user, calculate their total plays and rank them from highest to lowest.
+-- 34.For each user, calculate their total plays and rank them from highest to lowest.
 WITH total_plays AS (
 	SELECT 
 		user_id, 
@@ -485,7 +394,7 @@ LEFT JOIN total_plays tp
 	ON u.user_id = tp.user_id;
 
 
--- 46.List songs along with how many times they’ve been played, but only include songs above the average play count.
+-- 35.List songs along with how many times they’ve been played, but only include songs above the average play count.
 WITH total_plays AS (
 	SELECT 
 		song_id,
@@ -514,19 +423,19 @@ ORDER BY tp.play_count DESC;
 -- 13. VIEWS  
 -- =========================================================
 
-/*To see the views for exercises 47,48,49 and 50 
+/*To see the views for exercises 36, 37, 38 and 39 
 check the views section in schema. */ 
 
--- 47. Test view v_artist_album_song
+-- 36.Test view v_artist_album_song
 SELECT * FROM v_artist_album_song;
 
--- 48. Test view v_plays_per_song 
+-- 37.Test view v_plays_per_song 
 SELECT * FROM v_plays_per_song ORDER BY play_count DESC;
 
--- 49. Test view v_user_playlists
+-- 38.Test view v_user_playlists
 SELECT * FROM v_user_playlists ORDER BY playlist_count DESC;
 
--- 50. Test view v_public_playlists WITH CHECK OPTION
+-- 39.Test view v_public_playlists WITH CHECK OPTION
 INSERT INTO v_public_playlists (
     user_id,
     playlist_name,
@@ -550,7 +459,7 @@ DELETE FROM playlists WHERE playlist_id = 13;
 -- 14. ADVANCED JOINS  
 -- =========================================================
 
--- 51.List all songs along with their album, artist, and total play count in a single query.
+-- 40.List all songs along with their album, artist, and total play count in a single query.
 WITH play_counts AS (
 	SELECT 
 		song_id,
@@ -576,7 +485,7 @@ GROUP BY s.song_name, a.album_name, ar.artist_name, pc.play_count
 ORDER BY play_count DESC; 
 
 
--- 52.Find all users who have created playlists containing songs they have also played.
+-- 41.Find all users who have created playlists containing songs they have also played.
 SELECT 
     u.user_id,
     u.user_name
@@ -593,7 +502,7 @@ WHERE EXISTS (
 );
 
 
--- 53.Show all pairs of users who have at least one song in common across their playlists and count them.
+-- 42.Show all pairs of users who have at least one song in common across their playlists and count them.
 
 WITH users_songs AS (
 	SELECT 
@@ -615,7 +524,7 @@ JOIN users_songs b
 GROUP BY a.user_id, b.user_id; 
 
 
--- 54.List playlists that contain songs from more than one artist.
+-- 43.List playlists that contain songs from more than one artist.
  SELECT 
  	p.playlist_name
  FROM playlists p
@@ -627,7 +536,7 @@ GROUP BY p.playlist_name
 HAVING COUNT(DISTINCT sa.artist_id) > 1; 
 
 
--- 55.Find songs that appear in multiple playlists, along with how many playlists they appear in.
+-- 44.Find songs that appear in multiple playlists, along with how many playlists they appear in.
 SELECT
 	s.song_id,
 	s.song_name,
@@ -643,7 +552,7 @@ ORDER BY playlist_count DESC;
 -- 15. SECURITY & GRANTS   
 -- =========================================================
 
--- 56.Create a read-only role that can only view songs, artists, and albums but cannot modify any data.
+-- 45.Create a read-only role that can only view songs, artists, and albums but cannot modify any data.
 DROP ROLE IF EXISTS read_only;
 DROP USER IF EXISTS alice;
 
@@ -668,7 +577,7 @@ INSERT INTO songs (album_id, song_name)
 VALUES (NULL, 'First Single');
 
 RESET ROLE;
--- 57.Grant a specific user permission to insert plays but not delete them.
+-- 46.Grant a specific user permission to insert plays but not delete them.
 CREATE ROLE insert_plays;
 
 GRANT USAGE ON SCHEMA public TO insert_plays;
@@ -704,7 +613,7 @@ WHERE play_id = 186;
 -- 16. TRANSACTIONS & ISOLATION   
 -- =========================================================
 
--- 58.Simulate creating a playlist and adding songs to it, ensuring that if any insert fails, nothing is saved.
+-- 47.Simulate creating a playlist and adding songs to it, ensuring that if any insert fails, nothing is saved.
 BEGIN; 
 
 -- create a new playlist and return its id 
@@ -715,7 +624,7 @@ RETURNING playlist_id
 )
 
 
--- ERROR: insert or update on table "playlist_songs" violates foreign key constraint ", song 999999 doesn't exist
+-- ERROR: insert fails because song 999999 doesn't exist
 INSERT INTO playlist_songs (playlist_id, song_id, position)
 SELECT playlist_id, 999999, 1 FROM new_playlist;
 
@@ -763,7 +672,7 @@ DELETE FROM playlists WHERE playlist_name = 'Meditation Tunes';
 
 
 
--- 59.Update a playlist name and log the change, then roll back the transaction and verify the log behavior.
+-- 48.Update a playlist name and log the change, then roll back the transaction and verify the log behavior.
 
 BEGIN; 
 
@@ -776,7 +685,7 @@ ROLLBACK; -- the log won't happen due to rollback and atomicity
 
 
 
--- 60.Delete a song and observe how related records behave across all tables inside a transaction before committing.
+-- 49.Delete a song and observe how related records behave across all tables inside a transaction before committing.
 BEGIN; 
 
 
@@ -803,7 +712,7 @@ SELECT * FROM playlist_songs WHERE song_id = 4;
 -- =========================================================
 
 
--- 61. Test the "create playlist" trigger.
+-- 50. Test the "create playlist" trigger.
 
 INSERT INTO playlists (user_id, playlist_name, p_type)
 VALUES (2, 'My Daily Mix', 'public'); 
@@ -812,7 +721,7 @@ SELECT * FROM playlists WHERE playlist_name = 'My Daily Mix' AND user_id = 2;
 SELECT * FROM user_logs; 
 
 
--- 62. Test the "rename playlist" trigger.
+-- 51. Test the "rename playlist" trigger.
 UPDATE playlists
 SET playlist_name = 'My Monthly Mix'
 WHERE playlist_name = 'My Daily Mix'
@@ -822,7 +731,7 @@ SELECT * FROM playlists WHERE playlist_name = 'My Monthly Mix' AND user_id = 2;
 SELECT * FROM user_logs;
 
 
--- 63. Test the "delete playlist" trigger.
+-- 52. Test the "delete playlist" trigger.
 DELETE FROM playlists 
 WHERE playlist_name = 'My Monthly Mix' 
 	AND user_id = 2;
@@ -831,7 +740,7 @@ SELECT * FROM playlists WHERE playlist_name = 'My Monthly Mix' AND user_id = 2;
 SELECT * FROM user_logs;
 
 
--- 64. Test the "add song to playlist" trigger.
+-- 53. Test the "add song to playlist" trigger.
 
 INSERT INTO playlist_songs (playlist_id, song_id, position)
 VALUES (1, 2, 4);
@@ -839,7 +748,7 @@ VALUES (1, 2, 4);
 SELECT * FROM user_logs;
 SELECT * FROM playlist_songs WHERE playlist_id = 1;
 
--- 65. Test the "delete song from playlist" trigger. 
+-- 54. Test the "delete song from playlist" trigger. 
 DELETE FROM playlist_songs 
 WHERE playlist_id = 1
 	AND song_id = 2; 
