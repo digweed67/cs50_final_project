@@ -127,11 +127,14 @@ GROUP BY a.album_id, a.album_name
 HAVING COUNT(s.song_id) > 2
 ORDER BY a.album_id;
 
+
+
 -- =====================================
 -- 6. JOINS
 -- =====================================
 
 -- 14.List all songs along with the names of their artists.
+-- We link songs and artists through the junction table song_artists (many to many relationship)
 SELECT a.artist_name, s.song_name
 FROM songs s 
 JOIN song_artists sa
@@ -142,6 +145,7 @@ ORDER BY a.artist_name, s.song_name;
 
 
 -- 15.Display all playlists along with the username of the creator.
+-- Joins playlists to users showing a one-to-many relationship (one user can create many playlists)
 SELECT u.user_name, p.playlist_name
 FROM playlists p
 JOIN users u
@@ -150,6 +154,8 @@ ORDER BY u.user_name;
 
 
 -- 16.Show all songs in each playlist (playlist name + song name).
+-- Uses playlist_songs junction table to link playlists and songs.
+-- Demonstrates a many-to-many relationship between playlists and songs.
 SELECT p.playlist_name, s.song_name
 FROM playlists p
 JOIN playlist_songs ps
