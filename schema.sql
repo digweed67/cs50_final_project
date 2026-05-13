@@ -363,6 +363,9 @@ INSERT INTO artists (artist_name, country) VALUES
 ('Velvet Noise', 'AU'),
 ('Mono Signal', 'DE');
 
+/* ---------- ARTIST WITH NO SONGS ---------- */
+INSERT INTO artists (artist_name, country)
+VALUES ('Ghost Artist', 'US');
 
 /* ---------- ALBUMS ---------- */
 INSERT INTO albums (album_name, label, release_year) VALUES

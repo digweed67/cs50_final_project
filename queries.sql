@@ -165,17 +165,24 @@ JOIN songs s
 ORDER BY p.playlist_name, s.song_name; 
 
 
--- 17.List all plays along with the username and song name.
-SELECT p.play_id, u.user_name, s.song_name
-FROM plays p
-JOIN users u 
-	ON u.user_id = p.user_id 
-JOIN songs s
-	ON s.song_id = p.song_id
-ORDER BY p.play_id;
+-- 17.List all songs along with their total number of plays (including songs that have never been played).
+-- LEFT JOIN ensures songs with zero plays are included.
+-- This contrasts with Q11, which only returns songs with at least one play.
+SELECT 
+    s.song_id,
+    s.song_name,
+    COUNT(p.play_id) AS play_count
+FROM songs s
+LEFT JOIN plays p
+    ON s.song_id = p.song_id
+GROUP BY s.song_id, s.song_name
+ORDER BY play_count DESC;
 
 
 -- 18.Display all artists who have songs in the database.
+-- Inner join includes only artists with songs
+-- Song artists is a junction table which will have many duplicates for artists with many songs
+-- So we use DISTINCT to remove duplicates 
 SELECT DISTINCT a.artist_id, a.artist_name
 FROM artists a
 JOIN song_artists sa 
