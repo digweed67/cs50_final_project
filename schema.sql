@@ -133,7 +133,7 @@ CREATE INDEX idx_playlist_songs_song_id ON playlist_songs(song_id);
 
 
 /* ================== VIEWS ================== */ 
--- 47.Create a view that shows each song along with its artist(s) and album name(if any).
+-- 36.Create a view that shows each song along with its artist(s) and album name(if any).
 CREATE OR REPLACE VIEW v_artist_album_song AS 
 	SELECT 
 		a.artist_name,
@@ -148,7 +148,7 @@ CREATE OR REPLACE VIEW v_artist_album_song AS
 		ON a.artist_id = sa.artist_id;
 
 
--- 48.Create a view that summarizes total plays per song.
+-- 37.Create a view that summarizes total plays per song.
 
 CREATE OR REPLACE VIEW v_plays_per_song AS 
 	SELECT 
@@ -161,7 +161,7 @@ CREATE OR REPLACE VIEW v_plays_per_song AS
 	GROUP BY s.song_id, s.song_name; 
 
 
--- 49.Create a view that lists users and how many playlists they have created.
+-- 38.Create a view that lists users and how many playlists they have created.
 
 CREATE OR REPLACE VIEW v_user_playlists AS 
 	SELECT 
@@ -174,7 +174,7 @@ CREATE OR REPLACE VIEW v_user_playlists AS
 	GROUP BY u.user_id, u.user_name;
 
 
--- 50. Create a view that only shows public playlists and enforce that no private playlist can be inserted through it.
+-- 39. Create a view that only shows public playlists and enforce that no private playlist can be inserted through it.
 CREATE OR REPLACE VIEW v_public_playlists AS
 	SELECT 
 	    playlist_id,
