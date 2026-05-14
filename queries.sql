@@ -302,18 +302,24 @@ FROM plays;
 -- =======================================
 
 -- 27.Find all songs with names containing the word “Single”.
+-- Lower makes the comparison case sensitive 
+-- LIke with % matches any characters before or after the word "single".
 SELECT song_name
 FROM songs 
 WHERE LOWER(song_name) LIKE '%single%';
 
 
 -- 28.Show songs where the album is missing.
+-- Filters the rows where album_id is NULL.
+-- IS NULL is the right way to compare NULLS because = NULL evaluates to UNKNOWN.
 SELECT song_id, song_name
 FROM songs
 WHERE album_id IS NULL;
 
 
 -- 29.Replace NULL last_login values with a readable label like “Never logged in”.
+-- TO_CHAR converts the timestamp into text using the specified format.
+-- This allows COALESCE to replace NULL values with the string 'Never logged in' (coalesce requires compatible data types).
 SELECT 
 	user_name, 
 	COALESCE(
@@ -322,12 +328,16 @@ SELECT
 	)
 FROM users;
 
+
+
 -- =====================================
 -- 11. CASE / CONDITIONAL LOGIC
 -- =====================================
 
-
 -- 30.Categorize users as “Active” or “Moderate” or "Inactive" based on their number of plays.
+-- Counts total plays per user and classifies users based on activity level.
+-- LEFT JOIN ensures users with zero plays are included in the result.
+-- CASE assigns labels based on aggregated results.
 SELECT 
 	u.user_id,
 	u.user_name,
@@ -345,12 +355,14 @@ ORDER BY total_plays DESC;
 
  
 
-
 -- =========================================================
 -- 12. COMMON TABLE EXPRESSIONS (CTEs) AND WINDOW FUNCTIONS
 -- =========================================================
 
 -- 31.Find the top 5 users by total number of song plays, and include their usernames and play counts, including ties.
+-- First CTE calculates total plays per user.
+-- Second CTE applies DENSE_RANK to assign rankings based on play count (ties share the same rank).
+-- Final query joins users to ranked results and returns the top 5 ranks, including ties.
 WITH total_plays AS (
 	SELECT 	
 		user_id, 
@@ -373,6 +385,11 @@ ORDER BY r.play_count DESC;
 
 
 -- 32.Show each playlist along with the total number of songs it contains and label empty playlists clearly.
+-- First CTE counts how many songs are in each playlist.
+-- LEFT JOIN ensures playlists with no songs are still included.
+-- COALESCE converts NULL counts into 0 for empty playlists.
+-- We need coalesce here because aggregation in the cte happens before the left join.
+-- CASE labels playlists as either "Empty playlist" or "Contains songs".
 WITH total_songs AS (
 	SELECT 
 		playlist_id, 
@@ -396,6 +413,10 @@ ORDER BY song_count DESC;
 
 
 -- 33.Find the average number of songs per playlist, then list only playlists that exceed that average.
+-- First CTE calculates the number of songs in each playlist.
+-- Second CTE calculates the average playlist size across all playlists.
+-- CROSS JOIN is used to make the average value available to every row.
+-- Final query returns only playlists whose song count is above the overall average.
 WITH number_of_songs AS (
 	SELECT 
 		playlist_id,
@@ -421,6 +442,12 @@ WHERE ns.song_count > a.avg_song_count;
 
 
 -- 34.For each user, calculate their total plays and rank them from highest to lowest.
+-- First, the CTE `total_plays` aggregates the total number of plays per user.
+-- Then, the main query joins all users with the aggregated play counts.
+-- LEFT JOIN ensures users with zero plays are included.
+-- COALESCE(tp.play_count, 0) replaces NULLs from users with no plays with 0.
+-- DENSE_RANK() window function ranks users by total plays in descending order.
+-- Users with the same play count receive the same rank, no gaps.
 WITH total_plays AS (
 	SELECT 
 		user_id, 
@@ -439,6 +466,9 @@ LEFT JOIN total_plays tp
 
 
 -- 35.List songs along with how many times they’ve been played, but only include songs above the average play count.
+-- total_plays CTE counts plays per song.
+-- avg_total_plays CTE calculates the average play count.
+-- CROSS JOIN brings the average into each row, and WHERE filters songs above that average.
 WITH total_plays AS (
 	SELECT 
 		song_id,
@@ -462,6 +492,8 @@ JOIN total_plays tp
 CROSS JOIN avg_total_plays a
 WHERE tp.play_count > a.avg_play_count
 ORDER BY tp.play_count DESC; 
+
+
 
 -- =========================================================
 -- 13. VIEWS  
