@@ -247,12 +247,19 @@ HAVING COUNT(*) = (
 
 
 -- 23.Find songs that have never been played.
-SELECT song_id 
+-- NOT EXISTS checks whether a matching play row exists for each song.
+-- Unlike NOT IN which relies on comparison, it handles NULLs safely.
+-- Songs are returned only when no matching song_id exists in plays.
+SELECT song_id, song_name 
 FROM songs s
 WHERE NOT EXISTS (SELECT 1 FROM plays p WHERE s.song_id = p.song_id );
 
 
 -- 24.List playlists that contain more songs than the average playlist.
+-- The derived table produces a temporary table  with song count per playlist
+-- AVG(song_count) returns the average count of songs across all playlists.
+-- Outer query groups playlists_id and counts songs again, filtering only those above average
+-- Demonstrates nested subquery logic 
 SELECT playlist_id, COUNT(*) AS song_count
 FROM playlist_songs
 GROUP BY playlist_id
@@ -264,11 +271,15 @@ HAVING COUNT(*) > (
 		GROUP BY playlist_id) sub
 );
 
+
+
 -- =====================================
 -- 9. SET OPERATIONS
 -- =====================================
 
 -- 25.List all song IDs that appear in playlists or in plays.
+-- UNION combines song_ids from both queries into a single result set.
+-- Duplicate song_ids appearing in both tables are automatically removed.
 SELECT song_id 
 FROM playlist_songs 
 UNION 
@@ -277,6 +288,7 @@ FROM plays;
 
 
 -- 26.Find songs that are in playlists but have never been played. 
+-- EXCEPT returns song_ids from the first query that do not appear in the second query.
 SELECT song_id 
 FROM playlist_songs 
 EXCEPT 
@@ -288,7 +300,6 @@ FROM plays;
 -- =======================================
 -- 10. PATTERN MATCHING AND NULL HANDLING
 -- =======================================
-
 
 -- 27.Find all songs with names containing the word “Single”.
 SELECT song_name
