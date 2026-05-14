@@ -511,7 +511,7 @@ SELECT * FROM v_plays_per_song ORDER BY play_count DESC;
 -- 38.Test view v_user_playlists
 SELECT * FROM v_user_playlists ORDER BY playlist_count DESC;
 
--- 39.Test view v_public_playlists WITH CHECK OPTION
+-- 39.Test insert on view v_public_playlists WITH CHECK OPTION
 INSERT INTO v_public_playlists (
     user_id,
     playlist_name,
@@ -525,9 +525,10 @@ VALUES (
     'public'
 );
 
+-- Verify it worked:
 SELECT * FROM playlists WHERE playlist_name = 'Summer Party';
 
--- we delete it using the id in case there's various playlist with the same name 
+-- Cleanup test inserted data: 
 DELETE FROM playlists WHERE playlist_id = 13; 
 
 
@@ -536,6 +537,13 @@ DELETE FROM playlists WHERE playlist_id = 13;
 -- =========================================================
 
 -- 40.List all songs along with their album, artist, and total play count in a single query.
+-- CTE calculates total play count per song.
+-- Songs are then joined to albums (songs without albums become NULL → treated as "Single").
+-- song_artists acts as a junction table linking songs to artists (many-to-many relationship).
+-- LEFT JOIN to play_counts ensures songs with no plays are included.
+-- COALESCE handles NULLs from LEFT JOINs:
+--   - missing album → 'Single'
+--   - missing play count → 0
 WITH play_counts AS (
 	SELECT 
 		song_id,
@@ -562,6 +570,9 @@ ORDER BY play_count DESC;
 
 
 -- 41.Find all users who have created playlists containing songs they have also played.
+-- Uses EXISTS to check for at least one matching case per user.
+-- Subquery joins playlists → playlist_songs → plays to find overlap between:
+-- songs in user's playlists and songs the same user has played
 SELECT 
     u.user_id,
     u.user_name
@@ -579,7 +590,10 @@ WHERE EXISTS (
 
 
 -- 42.Show all pairs of users who have at least one song in common across their playlists and count them.
-
+-- CTE users_songs turns playlists into a users and songs table.
+-- Self-join compares the table to itself to find shared songs between users.
+-- a.user_id < b.user_id prevents duplicate pairs and self-matching.
+-- COUNT(*) returns the number of shared songs between each pair of users.
 WITH users_songs AS (
 	SELECT 
 		p.user_id,
@@ -601,6 +615,8 @@ GROUP BY a.user_id, b.user_id;
 
 
 -- 43.List playlists that contain songs from more than one artist.
+-- Join playlists → playlist_songs → song_artists to link playlists with artists.
+-- HAVING filters playlists that include songs from multiple artists.
  SELECT 
  	p.playlist_name
  FROM playlists p
@@ -613,6 +629,9 @@ HAVING COUNT(DISTINCT sa.artist_id) > 1;
 
 
 -- 44.Find songs that appear in multiple playlists, along with how many playlists they appear in.
+-- Joins playlist_songs with songs to get song details.
+-- COUNT(DISTINCT playlist_id) counts how many different playlists each song appears in.
+-- HAVING filters only songs that appear in more than one playlist.
 SELECT
 	s.song_id,
 	s.song_name,
@@ -623,6 +642,8 @@ JOIN songs s
 GROUP BY s.song_id, s.song_name 
 HAVING COUNT(DISTINCT playlist_id) > 1
 ORDER BY playlist_count DESC; 
+
+
 
 -- =========================================================
 -- 15. SECURITY & GRANTS   
