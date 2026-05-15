@@ -852,3 +852,68 @@ WHERE playlist_id = 1
 
 SELECT * FROM user_logs;
 SELECT * FROM playlist_songs WHERE playlist_id = 1;
+
+
+
+-- =========================================================
+-- 18. ADVANCED ANALYTICS QUERIES   
+-- =========================================================
+
+-- 55.Find the song with the highest play count within each album.
+WITH song_count AS (
+	SELECT 
+		s.song_id, 
+		s.song_name, 
+		s.album_id, 
+		COUNT(p.play_id) AS play_count
+	FROM songs s
+	LEFT JOIN plays p
+		ON p.song_id = s.song_id 
+	GROUP BY s.song_id, s.song_name, s.album_id
+),
+
+ranked_songs AS (
+	SELECT
+		a.album_name,
+		sc.song_name,
+		sc.play_count,
+		DENSE_RANK() OVER (PARTITION BY a.album_id ORDER BY sc.play_count DESC) rnk
+	FROM song_count sc
+	JOIN albums a
+		ON sc.album_id = a.album_id
+)
+
+SELECT 
+	album_name,
+	song_name,
+	play_count
+FROM ranked_songs
+WHERE rnk = 1; 
+
+
+-- 56.Return users who have listened to songs belonging to exactly one artist only.
+
+WITH user_songs AS (
+	SELECT DISTINCT 
+		user_id, 
+		song_id
+	FROM plays
+),
+users_artists AS (
+	SELECT 
+		us.*,
+		a.artist_id,
+		a.artist_name
+	FROM user_songs us
+	JOIN song_artists sa
+		ON us.song_id = sa.song_id
+	JOIN artists a 
+		ON sa.artist_id = a.artist_id
+)
+
+SELECT 
+	ua.user_id,
+	MAX(ua.artist_name) AS artist_name
+FROM users_artists ua 
+GROUP BY user_id 
+HAVING COUNT(DISTINCT ua.artist_id) = 1; 
