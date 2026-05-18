@@ -917,3 +917,54 @@ SELECT
 FROM users_artists ua 
 GROUP BY user_id 
 HAVING COUNT(DISTINCT ua.artist_id) = 1; 
+
+
+-- 57.Find the playlist with the highest number of distinct artists
+WITH playlist_artists AS (
+	SELECT 
+		p.playlist_id,
+		COUNT(DISTINCT a.artist_id) AS artist_count
+	FROM playlist_songs p 
+	JOIN song_artists sa 
+		ON p.song_id = sa.song_id 
+	JOIN artists a 
+		ON sa.artist_id = a.artist_id
+	GROUP BY p.playlist_id
+),
+
+ranked_playlist_artists AS (
+	SELECT 
+		pa.*,
+		RANK() OVER(ORDER BY pa.artist_count DESC) AS rnk
+	FROM playlist_artists pa
+)
+
+SELECT  
+	p.playlist_name,
+	rp.artist_count 
+FROM playlists p
+JOIN ranked_playlist_artists rp
+	ON p.playlist_id = rp.playlist_id
+WHERE rnk = 1; 
+
+
+-- 58.Rank albums by total number of plays of their songs
+
+WITH album_plays AS (
+    SELECT
+        a.album_id,
+        a.album_name,
+        COUNT(p.play_id) AS play_count
+    FROM albums a
+    JOIN songs s
+        ON a.album_id = s.album_id
+    LEFT JOIN plays p
+        ON p.song_id = s.song_id
+    GROUP BY a.album_id, a.album_name
+)
+
+SELECT
+    album_name,
+    play_count,
+    RANK() OVER (ORDER BY play_count DESC) AS rnk
+FROM album_plays;	
