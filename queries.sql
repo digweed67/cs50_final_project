@@ -906,22 +906,19 @@ WHERE rnk = 1;
 
 
 -- 58.Rank albums by total number of plays of their songs
-
 WITH album_plays AS (
     SELECT
-        a.album_id,
-        a.album_name,
-        COUNT(p.play_id) AS play_count
-    FROM albums a
+        s.album_id,
+        SUM(vps.play_count) AS play_count
+    FROM v_plays_per_song vps
     JOIN songs s
-        ON a.album_id = s.album_id
-    LEFT JOIN plays p
-        ON p.song_id = s.song_id
-    GROUP BY a.album_id, a.album_name
+        ON s.song_id = vps.song_id
+    GROUP BY s.album_id
 )
-
 SELECT
-    album_name,
-    play_count,
-    RANK() OVER (ORDER BY play_count DESC) AS rnk
-FROM album_plays;	
+    a.album_name,
+    ap.play_count,
+    RANK() OVER (ORDER BY ap.play_count DESC) AS rnk
+FROM album_plays ap
+JOIN albums a
+    ON a.album_id = ap.album_id;	
