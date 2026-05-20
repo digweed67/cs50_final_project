@@ -10,11 +10,9 @@ FROM users;
 
 
 -- 2.Show all songs along with their album names (including singles which don't belong to any albums).
--- LEFT JOIN is used so songs without an album still appear in the results.
-SELECT song_name, album_name
-FROM songs s
-LEFT JOIN albums a
-	ON s.album_id = a.album_id;  
+-- We use the view created for it, we coalesce songs with no album to "Single"
+SELECT song_name, album_name 
+FROM v_artist_album_song;
 
 
 -- 3. Display all songs that do not belong to any album.
@@ -131,14 +129,10 @@ ORDER BY a.album_id;
 -- =====================================
 
 -- 14.List all songs along with the names of their artists.
--- We link songs and artists through the junction table song_artists (many to many relationship)
-SELECT a.artist_name, s.song_name
-FROM songs s 
-JOIN song_artists sa
-	ON sa.song_id = s.song_id
-JOIN artists a
-	ON a.artist_id = sa.artist_id
-ORDER BY a.artist_name, s.song_name; 
+-- We use the view we've created for it
+SELECT artist_name, song_name 
+FROM v_artist_album_song 
+ORDER BY artist_name, song_name;
 
 
 -- 15.Display all playlists along with the username of the creator.
