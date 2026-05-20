@@ -512,36 +512,19 @@ DELETE FROM playlists WHERE playlist_id = 13;
 -- =========================================================
 
 -- 40.List all songs along with their album, artist, and total play count in a single query.
--- CTE calculates total play count per song.
--- Songs are then joined to albums (songs without albums become NULL → treated as "Single").
--- song_artists acts as a junction table linking songs to artists (many-to-many relationship).
 -- LEFT JOIN to play_counts ensures songs with no plays are included.
 -- COALESCE handles NULLs from LEFT JOINs:
 --   - missing album → 'Single'
 --   - missing play count → 0
-WITH play_counts AS (
-	SELECT 
-		song_id,
-		COUNT(*) AS play_count
-	FROM plays
-	GROUP BY song_id
-)
 SELECT
-	s.song_name, 
-	COALESCE(a.album_name, 'Single') AS album_name, 
-	ar.artist_name,
-	COALESCE(pc.play_count, 0) AS play_count
-FROM songs s
-LEFT JOIN albums a
-	ON s.album_id = a.album_id 
-JOIN song_artists sa
-	ON s.song_id = sa.song_id
-JOIN artists ar
-	ON sa.artist_id = ar.artist_id 
-LEFT JOIN play_counts pc
-	ON s.song_id = pc.song_id
-GROUP BY s.song_name, a.album_name, ar.artist_name, pc.play_count 
-ORDER BY play_count DESC; 
+    vas.song_name,
+    vas.album_name,
+    vas.artist_name,
+    COALESCE(vps.play_count, 0) AS play_count
+FROM v_artist_album_song vas
+LEFT JOIN v_plays_per_song vps
+    ON vas.song_id = vps.song_id
+ORDER BY play_count DESC;
 
 
 -- 41.Find all users who have created playlists containing songs they have also played.

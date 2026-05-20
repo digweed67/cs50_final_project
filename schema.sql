@@ -134,8 +134,11 @@ CREATE INDEX idx_playlist_songs_song_id ON playlist_songs(song_id);
 
 /* ================== VIEWS ================== */ 
 -- 36.Create a view that shows each song along with its artist(s) and album name(if any).
+DROP VIEW IF EXISTS v_artist_album_song;
+
 CREATE OR REPLACE VIEW v_artist_album_song AS 
 	SELECT 
+		s.song_id,
 		a.artist_name,
 		COALESCE(al.album_name, 'Single') AS album_name,
 		s.song_name 
