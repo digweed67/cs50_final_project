@@ -12,7 +12,7 @@ FROM users;
 -- 2.Show all songs along with their album names (including singles which don't belong to any albums).
 -- We use the view created for it, we coalesce songs with no album to "Single"
 SELECT song_name, album_name 
-FROM v_artist_album_song;
+FROM v_songs_clean;
 
 
 -- 3. Display all songs that do not belong to any album.
@@ -130,9 +130,9 @@ ORDER BY a.album_id;
 
 -- 14.List all songs along with the names of their artists.
 -- We use the view we've created for it
-SELECT artist_name, song_name 
-FROM v_artist_album_song 
-ORDER BY artist_name, song_name;
+SELECT artists, song_name 
+FROM v_songs_clean
+ORDER BY artists, song_name;
 
 
 -- 15.Display all playlists along with the username of the creator.
@@ -478,7 +478,8 @@ ORDER BY v.play_count DESC;
 check the views section in schema. */ 
 
 -- 36.Test view v_artist_album_song
-SELECT * FROM v_artist_album_song;
+SELECT * FROM v_artist_album_song;-- returns 24 rows (duplicated song because is by 2 artists)
+SELECT * FROM v_songs_clean;-- returns 23 rows (deduplicated songs)
 
 -- 37.Test view v_plays_per_song 
 SELECT * FROM v_plays_per_song ORDER BY play_count DESC;
@@ -517,13 +518,13 @@ DELETE FROM playlists WHERE playlist_id = 13;
 --   - missing album → 'Single'
 --   - missing play count → 0
 SELECT
-    vas.song_name,
-    vas.album_name,
-    vas.artist_name,
+    vsc.song_name,
+    vsc.album_name,
+    vsc.artists,
     COALESCE(vps.play_count, 0) AS play_count
-FROM v_artist_album_song vas
+FROM v_songs_clean vsc
 LEFT JOIN v_plays_per_song vps
-    ON vas.song_id = vps.song_id
+    ON vsc.song_id = vps.song_id
 ORDER BY play_count DESC;
 
 
