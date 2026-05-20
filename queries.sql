@@ -818,6 +818,7 @@ SELECT * FROM playlist_songs WHERE playlist_id = 1;
 -- =========================================================
 
 -- 55.Find the song with the highest play count within each album.
+-- Uses DENSE_RANK so ties are included.
 WITH song_count AS (
 	SELECT 
         vps.song_id,
@@ -849,6 +850,7 @@ WHERE rnk = 1;
 
 
 -- 56.Return users who have listened to songs belonging to exactly one artist only.
+-- Uses DISTINCT songs per user and counts distinct artists.
 
 WITH user_songs AS (
 	SELECT DISTINCT 
@@ -877,6 +879,7 @@ HAVING COUNT(DISTINCT ua.artist_id) = 1;
 
 
 -- 57.Find the playlist with the highest number of distinct artists
+-- Counts unique artists per playlist and ranks them.
 WITH playlist_artists AS (
 	SELECT 
 		p.playlist_id,
@@ -906,6 +909,7 @@ WHERE rnk = 1;
 
 
 -- 58.Rank albums by total number of plays of their songs
+-- Uses play counts from the v_plays_per_song view.
 WITH album_plays AS (
     SELECT
         s.album_id,
