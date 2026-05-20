@@ -820,14 +820,13 @@ SELECT * FROM playlist_songs WHERE playlist_id = 1;
 -- 55.Find the song with the highest play count within each album.
 WITH song_count AS (
 	SELECT 
-		s.song_id, 
-		s.song_name, 
-		s.album_id, 
-		COUNT(p.play_id) AS play_count
-	FROM songs s
-	LEFT JOIN plays p
-		ON p.song_id = s.song_id 
-	GROUP BY s.song_id, s.song_name, s.album_id
+        vps.song_id,
+        vps.song_name,
+        vps.play_count,
+        s.album_id
+    FROM v_plays_per_song vps
+    JOIN songs s
+        ON vps.song_id = s.song_id
 ),
 
 ranked_songs AS (
