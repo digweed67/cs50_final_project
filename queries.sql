@@ -456,32 +456,23 @@ LEFT JOIN total_plays tp
 
 
 -- 35.List songs along with how many times they’ve been played, but only include songs above the average play count.
--- total_plays CTE counts plays per song.
--- avg_total_plays CTE calculates the average play count.
+-- avg_total_plays CTE calculates the average play count, only including songs with plays.
 -- CROSS JOIN brings the average into each row, and WHERE filters songs above that average.
-WITH total_plays AS (
-	SELECT 
-		song_id,
-		COUNT(play_id) AS play_count
-	FROM plays 
-	GROUP BY song_id
-),
-avg_total_plays AS (
-	SELECT 
-		ROUND(AVG(play_count), 2) AS avg_play_count
-	FROM total_plays
+WITH avg_total_plays AS (
+    SELECT 
+        ROUND(AVG(play_count), 2) AS avg_play_count
+    FROM v_plays_per_song
+    WHERE play_count > 0
 )
 SELECT 
-	tp.song_id,
-	s.song_name,
-	tp.play_count,
-	a.avg_play_count
-FROM songs s
-JOIN total_plays tp
-	ON s.song_id = tp.song_id 
+    v.song_id,
+    v.song_name,
+    v.play_count,
+    a.avg_play_count
+FROM v_plays_per_song v
 CROSS JOIN avg_total_plays a
-WHERE tp.play_count > a.avg_play_count
-ORDER BY tp.play_count DESC; 
+WHERE v.play_count > a.avg_play_count
+ORDER BY v.play_count DESC;
 
 
 
