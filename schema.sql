@@ -17,7 +17,7 @@ SET search_path TO public;
 
 CREATE TABLE IF NOT EXISTS users (
 	user_id SERIAL PRIMARY KEY, -- auto increment unique id for each user
-	user_name VARCHAR(100) NOT NULL, -- username is required
+	user_name VARCHAR(100) UNIQUE NOT NULL, -- username is required
 	email VARCHAR(100) UNIQUE NOT NULL CHECK (email=LOWER(email)), -- must be unique and stored in lowercase
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- set default to current_timestamp
 	last_login TIMESTAMP -- allow nulls if user has never logged in

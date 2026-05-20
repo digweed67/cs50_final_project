@@ -850,6 +850,8 @@ WHERE rnk = 1;
 
 -- 56.Return users who have listened to songs belonging to exactly one artist only.
 -- Uses DISTINCT songs per user and counts distinct artists.
+-- USING MAX is safe because having returns only one artist. 
+-- We use max here to force the rule that every column that's not in the group by must be an aggregate 
 
 WITH user_songs AS (
 	SELECT DISTINCT 
@@ -871,7 +873,7 @@ users_artists AS (
 
 SELECT 
 	ua.user_id,
-	MAX(ua.artist_name) AS artist_name
+	MAX(ua.artist_name) AS artist_name 
 FROM users_artists ua 
 GROUP BY user_id 
 HAVING COUNT(DISTINCT ua.artist_id) = 1; 
