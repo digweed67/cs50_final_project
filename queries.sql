@@ -88,13 +88,10 @@ ORDER BY a.album_id ASC;
 
 
 -- 11.Find the total number of plays for each song, with at least 1 play.
--- Only includes songs that have at least one play record.
--- Inner join filters out songs with zero plays.
-SELECT s.song_id, s.song_name, COUNT(p.play_id) AS play_count
-FROM plays p
-JOIN songs s
-	ON p.song_id = s.song_id 
-GROUP BY s.song_id, s.song_name 	
+-- Only includes songs that have at least one play record (filters the left join from original view)
+SELECT *
+FROM v_plays_per_song
+WHERE play_count > 0
 ORDER BY play_count DESC;
 
 
