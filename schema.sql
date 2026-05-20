@@ -150,6 +150,18 @@ CREATE OR REPLACE VIEW v_artist_album_song AS
 	JOIN artists a
 		ON a.artist_id = sa.artist_id;
 
+-- create the same view but with aggregated artists so it returns one row per song
+CREATE OR REPLACE VIEW v_songs_clean AS
+SELECT 
+    s.song_id,
+    s.song_name,
+    COALESCE(al.album_name, 'Single') AS album_name,
+    STRING_AGG(a.artist_name, ', ') AS artists
+FROM songs s
+LEFT JOIN albums al ON s.album_id = al.album_id
+JOIN song_artists sa ON sa.song_id = s.song_id
+JOIN artists a ON a.artist_id = sa.artist_id
+GROUP BY s.song_id, s.song_name, al.album_name;
 
 -- 37.Create a view that summarizes total plays per song.
 
@@ -418,6 +430,10 @@ INSERT INTO songs (album_id, song_name) VALUES
 (NULL, 'Summer Escape'),
 (NULL, 'Broken Polaroid');
 
+-- Insert extra song with multiple artists 
+INSERT INTO songs (album_id, song_name)
+VALUES (NULL, 'Collab Energy');
+
 /* ---------- SONG_ARTISTS ---------- */
 INSERT INTO song_artists (song_id, artist_id) VALUES
 (1, 1), (2, 1), (3, 1),
@@ -448,6 +464,12 @@ INSERT INTO song_artists (song_id, artist_id) VALUES
 (20, 8),
 (21, 8),
 (22, 5);
+
+-- Insert a song with 2 artists:
+INSERT INTO song_artists (song_id, artist_id)
+VALUES
+(23, 1),  -- Coldplay
+(23, 2);  -- Taylor Swift
 
 /* ---------- PLAYLISTS ---------- */
 INSERT INTO playlists (user_id, playlist_name, p_type) VALUES
@@ -613,7 +635,6 @@ INSERT INTO plays (user_id, song_id, played_at) VALUES
 (13, 7, CURRENT_TIMESTAMP - INTERVAL '12 days'),
 (14, 11, CURRENT_TIMESTAMP - INTERVAL '15 days'),
 (15, 20, CURRENT_TIMESTAMP - INTERVAL '20 days');
-
 
 
 
