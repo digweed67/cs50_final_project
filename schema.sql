@@ -616,15 +616,5 @@ INSERT INTO plays (user_id, song_id, played_at) VALUES
 
 
 
-SELECT * FROM users;
-SELECT * FROM artists;
-SELECT * FROM albums;
-SELECT * FROM songs;
-SELECT * FROM song_artists;
-SELECT * FROM playlists;
-SELECT * FROM playlist_songs;
-SELECT * FROM plays;
-SELECT * FROM user_logs;
-
 
 
