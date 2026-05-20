@@ -163,16 +163,9 @@ ORDER BY p.playlist_name, s.song_name;
 
 
 -- 17.List all songs along with their total number of plays (including songs that have never been played).
--- LEFT JOIN ensures songs with zero plays are included.
--- This contrasts with Q11, which only returns songs with at least one play.
-SELECT 
-    s.song_id,
-    s.song_name,
-    COUNT(p.play_id) AS play_count
-FROM songs s
-LEFT JOIN plays p
-    ON s.song_id = p.song_id
-GROUP BY s.song_id, s.song_name
+-- Re-written to use the view(uses a left join to include songs with zero plays)
+SELECT *
+FROM v_plays_per_song
 ORDER BY play_count DESC;
 
 
