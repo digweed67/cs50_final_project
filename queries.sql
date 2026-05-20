@@ -609,6 +609,8 @@ ORDER BY playlist_count DESC;
 -- =========================================================
 
 -- 45.Create a read-only role that can only view songs, artists, and albums but cannot modify any data.
+-- plaintext passwords are used for simplicity.
+-- Real applications should hash passwords and restrict access.
 DROP ROLE IF EXISTS read_only;
 DROP USER IF EXISTS alice;
 
@@ -684,7 +686,7 @@ RETURNING playlist_id
 INSERT INTO playlist_songs (playlist_id, song_id, position)
 SELECT playlist_id, 999999, 1 FROM new_playlist;
 
-COMMIT; -- is ignored because transaction has been aborted 
+COMMIT; -- doesn't succeed because transaction has been aborted 
 
 -- Try to select something now and this happens:
 -- ERROR: current transaction is aborted, commands ignored until end of transaction block

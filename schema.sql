@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS plays (
 CREATE TABLE IF NOT EXISTS playlist_songs (
 	playlist_id INT NOT NULL,
 	song_id INT NOT NULL,
-	position INT NOT NULL,
+	position INT NOT NULL CHECK (position > 0),
 	PRIMARY KEY (playlist_id, song_id),
 	UNIQUE(playlist_id, position), -- position is unique per playlist
 	FOREIGN KEY (playlist_id) REFERENCES playlists(playlist_id) ON DELETE CASCADE,
