@@ -99,15 +99,11 @@ ORDER BY play_count DESC;
 -- =====================================
 
 -- 12.Show songs that have been played more than 5 times.
--- Inner join prevents songs with zero plays to be included
--- having filters aggregated results, so once all plays are counted, select those higher than 5
-SELECT s.song_id, s.song_name, COUNT(p.play_id) AS play_count
-FROM songs s
-JOIN plays p
-	ON s.song_id = p.song_id 
-GROUP BY s.song_id, s.song_name
-HAVING COUNT(p.play_id) > 5
-ORDER BY s.song_id;
+-- having filters aggregated results from the play count and select those higher than 5
+SELECT song_id, song_name, play_count
+FROM v_plays_per_song
+WHERE play_count > 5
+ORDER BY song_id;
  
 
 -- 13.Find albums release after 2000 and with more than 2 songs.
